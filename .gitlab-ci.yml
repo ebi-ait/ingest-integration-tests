@@ -7,7 +7,6 @@ test_ingest_to_upload:
      - python -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
   only:
     - dev
-    - integration
     - staging
   tags:
     - ingest-integration-tests
@@ -28,7 +27,6 @@ test_secondary_submission:
      - python -m unittest tests.test_ingest.TestRun.test_10x_analysis_run
   only:
     - dev
-    - integration
     - staging
   tags:
     - ingest-integration-tests
@@ -39,7 +37,6 @@ test_big_submission:
      - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
-    - integration
     - staging
   tags:
     - ingest-integration-tests
