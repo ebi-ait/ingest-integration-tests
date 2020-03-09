@@ -71,7 +71,7 @@ before_script:
   - apt-get -y install jq		
   - apt-get -y install awscli
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
-  - chmod 777 & ./setup_ingest_config.sh
+  - chmod a+x & ./setup_ingest_config.sh
   - pip install -r requirements.txt
   - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
   - aws secretsmanager get-secret-value --region us-east-1 --secret-id dcp/ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
