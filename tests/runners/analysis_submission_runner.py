@@ -126,30 +126,14 @@ class AnalysisSubmissionRunner:
         # self.submission_manager.stage_data_files('s3://org-humancellatlas-ingest-integration-test/analyses-data')
 
         self.submission_manager.select_upload_area()
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/metrics_summary.csv')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/filtered_gene_bc_matrices_h5.h5')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/molecule_info.h5')
-        self.submission_manager.upload_files('s3://org-humancellatlas-ingest-integration-test/analysis-data/genes.tsv')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/barcodes.tsv')
-        self.submission_manager.upload_files('s3://org-humancellatlas-ingest-integration-test/analysis-data/matrix.mtx')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/barcodes.tsv')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/possorted_genome_bam.bam.bai')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/raw_genes.tsv')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/raw_gene_bc_matrices_h5.h5')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/web_summary.html')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/raw_matrix.mtx')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/possorted_genome_bam.bam')
-        self.submission_manager.upload_files(
-            's3://org-humancellatlas-ingest-integration-test/analysis-data/raw_barcodes.tsv')
-        self.submission_manager.forget_about_upload_area()
+        analysis_files = self.analysis_submission.get_files()
+        analysis_filenames = [AnalysisSubmissionRunner.mock_analysis_file(f["fileName"]) for f in analysis_files]
+        for f in analysis_filenames:
+            self.submission_manager.upload_files(f)
+
+    @staticmethod
+    def mock_analysis_file(file_name):
+        with open(file_name, "w") as f:
+            f.write("mockdata")
+        return file_name
+

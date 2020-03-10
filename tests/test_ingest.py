@@ -28,7 +28,7 @@ class TestIngest(unittest.TestCase):
         if self.deployment not in DEPLOYMENTS:
             raise RuntimeError(f'DEPLOYMENT_ENV environment variable must be one of {DEPLOYMENTS}')
 
-        self.ingest_client_api = IngestApi(url=f"https://api.ingest.{self.deployment}.data.humancellatlas.org")
+        self.ingest_client_api = IngestApi(url=f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org")
         self.s2s_token_client = S2STokenClient()
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         self.s2s_token_client.setup_from_file(gcp_credentials_file)

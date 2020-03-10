@@ -9,7 +9,7 @@ from ingest.utils.token_manager import TokenManager
 
 class IngestUIAgent:
 
-    INGEST_UI_URL_TEMPLATE = "https://ingest.{}.data.humancellatlas.org"
+    INGEST_UI_URL_TEMPLATE = "https://ingest.{}.archive.data.humancellatlas.org"
 
     def __init__(self, deployment):
         self.deployment = deployment
@@ -39,7 +39,7 @@ class IngestUIAgent:
 
 class IngestApiAgent:
 
-    INGEST_API_URL_TEMPLATE = "https://api.ingest.{}.data.humancellatlas.org"
+    INGEST_API_URL_TEMPLATE = "https://api.ingest.{}.archive.data.humancellatlas.org"
 
     def __init__(self, deployment):
         self.deployment = deployment
