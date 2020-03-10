@@ -8,7 +8,6 @@ test_ingest_to_upload:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
   only:
-    - task/ebi-gitlab
     - dev
     - staging
   tags:
@@ -29,7 +28,6 @@ test_secondary_submission:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_10x_analysis_run
   only:
-    - task/ebi-gitlab
     - dev
     - staging
   tags:
@@ -40,7 +38,6 @@ test_big_submission:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
-    - task/ebi-gitlab
     - dev
     - staging
   tags:
