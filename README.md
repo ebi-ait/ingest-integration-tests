@@ -24,7 +24,7 @@ environment. To retrieve GCP credentials, the AWS CLI can be used:
 aws --profile=hca secretsmanager get-secret-value\
     --region us-east-1\ 
     --secret-id dcp/ingest/dev/gcp-credentials.json\
-    --query SecretString | jq -rc > _local/gcp-credentials-dev.json
+    --query SecretString | jq -rc '.' > _local/gcp-credentials-dev.json
 ```
 
 **IMPORTANT**: Store the credentials file in a secured location. Make sure to not commit it to version control. 
