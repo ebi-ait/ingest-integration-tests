@@ -39,7 +39,7 @@ commonly required variables are `DEPLOYMENT_ENV` and `GOOGLE_APPLICATION_CREDENT
 ```
 export DEPLOYMENT_ENV=dev; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
-python -m unittest tests.test_add_bundle.AddBundleTest.test_run
+python3 -m unittest tests.test_add_bundle.AddBundleTest.test_run
 ``` 
 
 #### Gitlab Runner
