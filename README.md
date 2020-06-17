@@ -33,13 +33,19 @@ ignored by the version control system.
 
 ##### Running a Single Test
 
+If you haven't already done so, you will need to configure the HCA CLI tool to use the EBI installation of the upload service rather than the DCP (default) version.
+
+```
+./setup_ingest_config.sh
+```
+
 To run a single test, make sure that all necessary environment variables are provided. At the time of writing, the most
 commonly required variables are `DEPLOYMENT_ENV` and `GOOGLE_APPLICATION_CREDENTIALS`.
 
 ```
 export DEPLOYMENT_ENV=dev; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
-python -m unittest tests.test_add_bundle.AddBundleTest.test_run
+python3 -m unittest tests.test_add_bundle.AddBundleTest.test_run
 ``` 
 
 #### Gitlab Runner

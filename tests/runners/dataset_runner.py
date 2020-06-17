@@ -26,9 +26,6 @@ class DatasetRunner:
         self.submission_manager.get_upload_area_credentials()
         self.submission_manager.stage_data_files(self.dataset.config['data_files_location'])
         self.submission_manager.wait_for_envelope_to_be_validated()
-        self.submission_manager.submission_envelope.disable_indexing()
-        self.submission_manager.submit_envelope()
-        self.submission_manager.wait_for_envelope_to_be_validated()
 
     def complete_run(self, dataset_fixture, project_uuid=None):
         self.dataset = dataset_fixture
