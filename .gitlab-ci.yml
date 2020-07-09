@@ -66,7 +66,7 @@ test_big_submission:
 before_script:
   - apk update
   - apk add  jq
-  - apk add awscli
+  - pip install awscli
   - pip install -r requirements.txt
   - hca
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
