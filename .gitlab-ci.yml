@@ -64,9 +64,9 @@ test_big_submission:
 #    - staging
 
 before_script:
-  - apt-get -y update		
-  - apt-get -y install jq		
-  - apt-get -y install awscli
+  - apk update
+  - apk add  jq
+  - apk add awscli
   - pip install -r requirements.txt
   - hca
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
