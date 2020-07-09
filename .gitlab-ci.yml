@@ -1,4 +1,4 @@
-image: python:3.6-alpine
+image: python:3.6
 
 stages:
   - test
@@ -64,8 +64,8 @@ test_big_submission:
 #    - staging
 
 before_script:
-  - apt-get -y update		
-  - apt-get -y install jq		
+  - apt-get -y update
+  - apt-get -y install jq
   - apt-get -y install awscli
   - pip install -r requirements.txt
   - hca
