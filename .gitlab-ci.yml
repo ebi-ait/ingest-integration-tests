@@ -67,6 +67,7 @@ before_script:
   - apk update
   - apk add  jq
   - apk add git
+  - apk add --no-cache --virtual .build-deps gcc musl-dev && pip install cython && apk del .build-deps gcc musl-dev
   - pip install awscli
   - pip install -r requirements.txt
   - hca
