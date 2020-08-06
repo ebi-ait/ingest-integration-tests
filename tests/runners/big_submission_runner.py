@@ -40,3 +40,4 @@ class BigSubmissionRunner:
         self.submission_manager.upload_files(f'{metadata_fixture.data_files_location}{filename}')
         self.submission_manager.forget_about_upload_area()
         self.submission_manager.wait_for_envelope_to_be_validated()
+        self.submission_envelope.delete()

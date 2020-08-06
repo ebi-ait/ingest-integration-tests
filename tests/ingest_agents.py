@@ -15,7 +15,7 @@ class IngestBrokerAgent:
     def __init__(self, deployment):
         self.deployment = deployment
         if self.deployment == 'prod':
-            self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
+            self.ingest_broker_url = self.INGEST_BROKER_PROD_URL
         else:
             self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
 
@@ -142,6 +142,10 @@ class IngestApiAgent:
 
         def get_bundle_manifests(self):
             return self._get_entity_list('bundleManifests')
+
+        def delete(self):
+            r = requests.delete(self.url)
+            r.raise_for_status()
 
         def _get_entity_list(self, entity_type):
             url = self.data['_links'][entity_type]['href']
