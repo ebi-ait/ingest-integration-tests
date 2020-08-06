@@ -28,11 +28,17 @@ class TestIngest(unittest.TestCase):
         if self.deployment not in DEPLOYMENTS:
             raise RuntimeError(f'DEPLOYMENT_ENV environment variable must be one of {DEPLOYMENTS}')
 
-        self.ingest_client_api = IngestApi(url=f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org")
+        if self.deployment == 'prod':
+            self.ingest_api_url = f"https://api.ingest.archive.data.humancellatlas.org"
+        else:
+            self.ingest_api_url = f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org"
+
+        self.ingest_client_api = IngestApi(url=self.ingest_api_url)
         self.s2s_token_client = S2STokenClient()
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         self.s2s_token_client.setup_from_file(gcp_credentials_file)
         self.token_manager = TokenManager(self.s2s_token_client)
+
         self.ingest_broker = IngestBrokerAgent(self.deployment)
         self.ingest_api = IngestApiAgent(deployment=self.deployment)
 
@@ -40,6 +46,7 @@ class TestIngest(unittest.TestCase):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
         runner.valid_run(dataset_fixture)
+        runner.submission_envelope.delete()
         return runner
 
     def ingest(self, dataset_name):
@@ -112,7 +119,8 @@ class TestIngest(unittest.TestCase):
         self.assertEqual(attached_bundle_manifests[0]['bundleUuid'],
                          runner.bundle_manifest_uuid,
                          'The input bundle manifest for the analyses process is incorrect')
-
+        runner.primary_submission.delete()
+        runner.analysis_submission.delete()
         return runner
 
     def ingest_big_submission(self):
