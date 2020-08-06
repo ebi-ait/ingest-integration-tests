@@ -46,6 +46,7 @@ class TestIngest(unittest.TestCase):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
         runner.valid_run(dataset_fixture)
+        runner.submission_envelope.delete()
         return runner
 
     def ingest(self, dataset_name):
@@ -118,7 +119,8 @@ class TestIngest(unittest.TestCase):
         self.assertEqual(attached_bundle_manifests[0]['bundleUuid'],
                          runner.bundle_manifest_uuid,
                          'The input bundle manifest for the analyses process is incorrect')
-
+        runner.primary_submission.delete()
+        runner.analysis_submission.delete()
         return runner
 
     def ingest_big_submission(self):

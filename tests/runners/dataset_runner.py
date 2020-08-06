@@ -17,7 +17,7 @@ class DatasetRunner:
 
         self.dataset = None
 
-        self.submission_manager = None
+        self.submission_manager: SubmissionManager = None
 
     def valid_run(self, dataset_fixture):
         self.dataset = dataset_fixture
