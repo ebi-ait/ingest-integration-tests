@@ -17,7 +17,7 @@ from tests.runners.dataset_runner import DatasetRunner
 from tests.runners.submission_manager import SubmissionManager
 from tests.runners.update_submission_runner import UpdateSubmissionRunner
 
-DEPLOYMENTS = ('dev', 'integration', 'staging')
+DEPLOYMENTS = ('dev', 'integration', 'staging', 'prod')
 
 
 class TestIngest(unittest.TestCase):
