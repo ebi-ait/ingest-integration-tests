@@ -7,13 +7,18 @@ from ingest.utils.s2s_token_client import S2STokenClient
 from ingest.utils.token_manager import TokenManager
 
 
-class IngestUIAgent:
+class IngestBrokerAgent:
 
-    INGEST_UI_URL_TEMPLATE = "https://ingest.{}.archive.data.humancellatlas.org"
+    INGEST_BROKER_URL_TEMPLATE = "https://ingest.{}.archive.data.humancellatlas.org"
+    INGEST_BROKER_PROD_URL = "https://ingest.archive.data.humancellatlas.org"
 
     def __init__(self, deployment):
         self.deployment = deployment
-        self.ingest_broker_url = self.INGEST_UI_URL_TEMPLATE.format(self.deployment)
+        if self.deployment == 'prod':
+            self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
+        else:
+            self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
+
         self.ingest_auth_agent = IngestAuthAgent()
         self.auth_headers = self.ingest_auth_agent.make_auth_header()
 
@@ -37,13 +42,20 @@ class IngestUIAgent:
         response = requests.get(url)
         return response.content
 
+
 class IngestApiAgent:
 
     INGEST_API_URL_TEMPLATE = "https://api.ingest.{}.archive.data.humancellatlas.org"
+    INGEST_API_PROD_URL = "https://api.ingest.archive.data.humancellatlas.org"
 
     def __init__(self, deployment):
         self.deployment = deployment
-        self.ingest_api_url = self.INGEST_API_URL_TEMPLATE.format(self.deployment)
+
+        if self.deployment == 'prod':
+            self.ingest_api_url = self.INGEST_API_PROD_URL
+        else:
+            self.ingest_api_url = self.INGEST_API_URL_TEMPLATE.format(self.deployment)
+
         self.ingest_auth_agent = IngestAuthAgent()
         self.auth_headers = self.ingest_auth_agent.make_auth_header()
 
