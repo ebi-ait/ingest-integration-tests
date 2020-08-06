@@ -4,7 +4,7 @@ import openpyxl
 from ingest.api.ingestapi import IngestApi
 
 from tests.fixtures.dataset_fixture import DatasetFixture
-from tests.ingest_agents import IngestApiAgent, IngestUIAgent
+from tests.ingest_agents import IngestApiAgent, IngestBrokerAgent
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
@@ -29,7 +29,7 @@ class BundleManifest:
 
 
 class UpdateSubmissionRunner:
-    def __init__(self, deployment, ingest_broker: IngestUIAgent, ingest_api: IngestApiAgent,
+    def __init__(self, deployment, ingest_broker: IngestBrokerAgent, ingest_api: IngestApiAgent,
                  ingest_client_api: IngestApi):
         self.deployment = deployment
         self.ingest_broker = ingest_broker

@@ -10,7 +10,7 @@ from ingest.utils.token_manager import TokenManager
 from tests.fixtures.analysis_submission_fixture import AnalysisSubmissionFixture
 from tests.fixtures.dataset_fixture import DatasetFixture
 from tests.fixtures.metadata_fixture import MetadataFixture
-from tests.ingest_agents import IngestUIAgent, IngestApiAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
 from tests.runners.analysis_submission_runner import AnalysisSubmissionRunner
 from tests.runners.big_submission_runner import BigSubmissionRunner
 from tests.runners.dataset_runner import DatasetRunner
@@ -33,7 +33,7 @@ class TestIngest(unittest.TestCase):
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         self.s2s_token_client.setup_from_file(gcp_credentials_file)
         self.token_manager = TokenManager(self.s2s_token_client)
-        self.ingest_broker = IngestUIAgent(self.deployment)
+        self.ingest_broker = IngestBrokerAgent(self.deployment)
         self.ingest_api = IngestApiAgent(deployment=self.deployment)
 
     def ingest_and_upload_only(self, dataset_name):
