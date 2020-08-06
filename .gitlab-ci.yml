@@ -10,6 +10,7 @@ test_ingest_to_upload:
   only:
     - dev
     - staging
+    - prod
   tags:
     - ingest-integration-tests
 
