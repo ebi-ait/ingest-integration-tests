@@ -15,7 +15,7 @@ class IngestBrokerAgent:
     def __init__(self, deployment):
         self.deployment = deployment
         if self.deployment == 'prod':
-            self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
+            self.ingest_broker_url = self.INGEST_BROKER_PROD_URL
         else:
             self.ingest_broker_url = self.INGEST_BROKER_URL_TEMPLATE.format(self.deployment)
 

@@ -33,6 +33,9 @@ class DatasetFixture:
         if self.deployment == 'dev':
             branch = 'develop'
 
+        if self.deployment == 'prod':
+            branch = 'master'
+
         with open(readme_json_path) as json_data:
             self.config = json.load(json_data)
             self.config["spreadsheet_location"] = self.config[
