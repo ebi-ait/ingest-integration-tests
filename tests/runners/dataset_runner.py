@@ -1,6 +1,6 @@
 import os
 
-from tests.ingest_agents import IngestUIAgent, IngestApiAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
@@ -10,7 +10,7 @@ class DatasetRunner:
     def __init__(self, deployment):
         self.deployment = deployment
 
-        self.ingest_broker = IngestUIAgent(deployment)
+        self.ingest_broker = IngestBrokerAgent(deployment)
         self.ingest_api = IngestApiAgent(deployment=deployment)
         self.submission_id = None
         self.submission_envelope = None

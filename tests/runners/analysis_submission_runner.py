@@ -10,13 +10,13 @@ from ingest.utils.token_manager import TokenManager
 
 from tests.fixtures.analysis_submission_fixture import \
     AnalysisSubmissionFixture
-from tests.ingest_agents import IngestUIAgent, IngestApiAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
 
 class AnalysisSubmissionRunner:
-    def __init__(self, deployment, ingest_broker: IngestUIAgent, ingest_api: IngestApiAgent,
+    def __init__(self, deployment, ingest_broker: IngestBrokerAgent, ingest_api: IngestApiAgent,
                  token_manager: TokenManager, ingest_client_api: IngestApi):
         self.deployment = deployment
         self.ingest_broker = ingest_broker
