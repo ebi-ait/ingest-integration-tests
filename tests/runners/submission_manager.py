@@ -1,11 +1,11 @@
 import subprocess
+import time
 from urllib.parse import urlparse
+
 from requests import HTTPError
 
 from tests.utils import Progress
 from tests.wait_for import WaitFor
-
-import time
 
 MINUTE = 60
 

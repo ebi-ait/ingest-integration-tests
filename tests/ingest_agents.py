@@ -8,7 +8,6 @@ from ingest.utils.token_manager import TokenManager
 
 
 class IngestBrokerAgent:
-
     INGEST_BROKER_URL_TEMPLATE = "https://ingest.{}.archive.data.humancellatlas.org"
     INGEST_BROKER_PROD_URL = "https://ingest.archive.data.humancellatlas.org"
 
@@ -44,7 +43,6 @@ class IngestBrokerAgent:
 
 
 class IngestApiAgent:
-
     INGEST_API_URL_TEMPLATE = "https://api.ingest.{}.archive.data.humancellatlas.org"
     INGEST_API_PROD_URL = "https://api.ingest.archive.data.humancellatlas.org"
 
@@ -75,7 +73,7 @@ class IngestApiAgent:
 
         def get_uuid(self):
             uuid = self._source.get('uuid')
-            return uuid.get('uuid') # because uuid's are structured as uuid.uuid in the source JSON
+            return uuid.get('uuid')  # because uuid's are structured as uuid.uuid in the source JSON
 
     class SubmissionEnvelope:
 
@@ -144,8 +142,16 @@ class IngestApiAgent:
             return self._get_entity_list('bundleManifests')
 
         def delete(self):
+            projects = self.get_projects()
+            project = projects[0] if len(projects) > 0 else None
+
             r = requests.delete(self.url)
             r.raise_for_status()
+
+            if project:
+                project_url = project['_links']['self']['href']
+                r = requests.delete(project_url)
+                r.raise_for_status()
 
         def _get_entity_list(self, entity_type):
             url = self.data['_links'][entity_type]['href']
@@ -153,9 +159,9 @@ class IngestApiAgent:
             r.raise_for_status()
             files = r.json()
             # TODO won't work for paginated result
-            result = files['_embedded'][entity_type] if files.get('_embedded') and files['_embedded'].get(entity_type) else []
+            result = files['_embedded'][entity_type] if files.get('_embedded') and files['_embedded'].get(
+                entity_type) else []
             return result
-
 
         @property
         def uuid(self):
@@ -190,10 +196,10 @@ class IngestAuthAgent:
     def make_auth_header(self):
         """Make the authorization headers to communicate with endpoints which implement Auth0 authentication API.
 
-        :return dict headers: A header with necessary token information to talk to Auth0 authentication required endpoints.
+        :return dict headers: A header with necessary token information to talk to Auth0 authentication required
+        endpoints.
         """
         headers = {
             "Authorization": f"Bearer {self._get_auth_token()}"
         }
         return headers
-
