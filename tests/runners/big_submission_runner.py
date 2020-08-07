@@ -23,9 +23,12 @@ class BigSubmissionRunner:
         submission_url = submission["_links"]["self"]["href"]
         self.submission_envelope = self.ingest_api.envelope(envelope_id=None, url=submission_url)
 
+        project = metadata_fixture.project
         biomaterial = metadata_fixture.biomaterial
         file = metadata_fixture.sequence_file
         filename = metadata_fixture.sequence_file['file_core']['file_name']
+
+        self.ingest_client_api.create_project(submission_url, project)
         self.ingest_client_api.create_file(submission_url, filename, file)
 
         for i in range(METADATA_COUNT):
