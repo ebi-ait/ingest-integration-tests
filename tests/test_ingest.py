@@ -42,7 +42,6 @@ class TestIngest(unittest.TestCase):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
         runner.valid_run(dataset_fixture)
-        runner.submission_envelope.delete()
         self.runner = runner
         return runner
 
