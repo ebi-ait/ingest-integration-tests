@@ -19,6 +19,7 @@ class TestIngest(unittest.TestCase):
 
     def setUp(self):
         self.deployment = os.environ.get('DEPLOYMENT_ENV', None)
+        self.no_cleanup = os.environ.get('NO_CLEANUP', False)
 
         if self.deployment not in DEPLOYMENTS:
             raise RuntimeError(f'DEPLOYMENT_ENV environment variable must be one of {DEPLOYMENTS}')
@@ -52,7 +53,8 @@ class TestIngest(unittest.TestCase):
         self.runner = runner
 
     def tearDown(self) -> None:
-        self.runner.submission_envelope.delete()
+        if not self.no_cleanup:
+            self.runner.submission_envelope.delete()
 
 
 class TestRun(TestIngest):
