@@ -46,7 +46,7 @@ class TestIngest(unittest.TestCase):
         self.runner = runner
         return runner
 
-    def ingest_to_archives(self, dataset_name):
+    def ingest_to_archives(self, dataset_name: str):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
         runner.valid_run(dataset_fixture)
@@ -81,7 +81,7 @@ class TestRun(TestIngest):
         self.ingest_big_submission()
 
     def test_ingest_to_archives(self):
-        runner = self.ingest_to_archives()
+        runner = self.ingest_to_archives('SS2')
 
     def test_exporting(self):
         runner = self.ingest_to_terra()
