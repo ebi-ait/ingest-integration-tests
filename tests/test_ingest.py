@@ -80,7 +80,7 @@ class TestRun(TestIngest):
     def test_big_submission_run(self):
         self.ingest_big_submission()
 
-    def test_archiving(self):
+    def test_ingest_to_archives(self):
         runner = self.ingest_to_archives()
 
     def test_exporting(self):
