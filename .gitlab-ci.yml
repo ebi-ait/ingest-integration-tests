@@ -42,7 +42,7 @@ before_script:
   - hca
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
   - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
+  - export DEPLOYMENT_ENV=dev
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
-  - export DEPLOYMENT_STAGE=dev
   - aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
   - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
