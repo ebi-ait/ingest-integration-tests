@@ -100,9 +100,12 @@ class IngestApiAgent:
         def status(self):
             return self.data['submissionState']
 
-        def submit(self):
+        def submit(self, submit_actions=None):
+            if not submit_actions:
+                submit_actions = []
+
             submit_url = self.url + '/submissionEvent'
-            r = requests.put(submit_url, headers=self.auth_headers)
+            r = requests.put(submit_url, headers=self.auth_headers, data=submit_actions)
             r.raise_for_status()
             return r
 

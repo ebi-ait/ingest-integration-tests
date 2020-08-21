@@ -46,6 +46,21 @@ class TestIngest(unittest.TestCase):
         self.runner = runner
         return runner
 
+    def ingest_to_archives(self, dataset_name):
+        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
+        runner = DatasetRunner(self.deployment)
+        runner.valid_run(dataset_fixture)
+        self.runner = runner
+        return runner
+
+    def ingest_to_terra(self, dataset_name):
+        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
+        runner = DatasetRunner(self.deployment)
+        runner.valid_run(dataset_fixture)
+        # TODO implement test
+        self.runner = runner
+        return runner
+
     def ingest_big_submission(self):
         metadata_fixture = MetadataFixture()
         runner = BigSubmissionRunner(self.deployment, self.ingest_client_api, self.token_manager)
@@ -63,7 +78,13 @@ class TestRun(TestIngest):
         runner = self.ingest_and_upload_only('SS2')
 
     def test_big_submission_run(self):
-        runner = self.ingest_big_submission()
+        self.ingest_big_submission()
+
+    def test_archiving(self):
+        runner = self.ingest_to_archives()
+
+    def test_exporting(self):
+        runner = self.ingest_to_terra()
 
 
 if __name__ == '__main__':

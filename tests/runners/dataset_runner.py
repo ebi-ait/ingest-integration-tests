@@ -19,22 +19,21 @@ class DatasetRunner:
 
         self.submission_manager: SubmissionManager = None
 
-    def valid_run(self, dataset_fixture):
+    def valid_run(self, dataset_fixture, project_uuid=None):
         self.dataset = dataset_fixture
-        self.upload_spreadsheet_and_create_submission(dataset_fixture)
+        self.upload_spreadsheet_and_create_submission(dataset_fixture, project_uuid)
         self.submission_manager = SubmissionManager(self.submission_envelope)
         self.submission_manager.get_upload_area_credentials()
         self.submission_manager.stage_data_files(self.dataset.config['data_files_location'])
         self.submission_manager.wait_for_envelope_to_be_validated()
 
+    def archived_run(self, dataset_fixture, project_uuid=None):
+        self.valid_run(dataset_fixture, project_uuid)
+        self.submission_manager.submit_envelope(["Archive"])
+        self.submission_manager.wait_for_envelope_to_be_archived()
+
     def complete_run(self, dataset_fixture, project_uuid=None):
-        self.dataset = dataset_fixture
-        self.upload_spreadsheet_and_create_submission(dataset_fixture, project_uuid=project_uuid)
-        self.submission_manager = SubmissionManager(self.submission_envelope)
-        self.submission_manager.get_upload_area_credentials()
-        self.submission_manager.stage_data_files(self.dataset.config['data_files_location'])
-        self.submission_manager.wait_for_envelope_to_be_validated()
-        self.submission_manager.submission_envelope.disable_indexing()
+        self.valid_run(dataset_fixture, project_uuid)
         self.submission_manager.submit_envelope()
         self.submission_manager.wait_for_envelope_to_complete()
 

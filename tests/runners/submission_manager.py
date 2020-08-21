@@ -42,8 +42,8 @@ class SubmissionManager:
     def upload_files(self, files):
         self._run_command(['hca', 'upload', 'files', files])
 
-    def submit_envelope(self):
-        self.submission_envelope.submit()
+    def submit_envelope(self, submit_actions=None):
+        self.submission_envelope.submit(submit_actions)
 
     def forget_about_upload_area(self):
         self.upload_area_uuid = urlparse(self.upload_credentials).path.split('/')[1]
@@ -72,6 +72,12 @@ class SubmissionManager:
         WaitFor(self._envelope_is_in_state, 'Complete').to_return_value(
             value=True)
         Progress.report(" envelope is in Complete.\n")
+
+    def wait_for_envelope_to_be_archived(self):
+        Progress.report("WAIT FOR ARCHIVED...")
+        WaitFor(self._envelope_is_in_state, 'Archived').to_return_value(
+            value=True)
+        Progress.report(" envelope is in Archived.\n")
 
     def _envelope_is_in_state(self, state):
         envelope_status = self.submission_envelope.reload().status()
