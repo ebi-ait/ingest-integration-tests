@@ -19,7 +19,7 @@ test_ingest_to_archives:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
   only:
-    - task_test-archiving-and-exporting
+    - task/test-archiving-and-exporting
   tags:
     - ingest-integration-tests
 
