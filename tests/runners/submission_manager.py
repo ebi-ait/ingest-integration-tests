@@ -61,6 +61,24 @@ class SubmissionManager:
             value=True)
         Progress.report(" envelope is submitted.\n")
 
+    def wait_for_envelope_to_be_archiving(self):
+        Progress.report("WAIT FOR ARCHIVING...")
+        WaitFor(self._envelope_is_in_state, 'Archiving').to_return_value(
+            value=True)
+        Progress.report(" envelope is in Archived.\n")
+
+    def wait_for_envelope_to_be_archived(self):
+        Progress.report("WAIT FOR ARCHIVED...")
+        WaitFor(self._envelope_is_in_state, 'Archived').to_return_value(
+            value=True)
+        Progress.report(" envelope is in Archived.\n")
+
+    def wait_for_envelope_to_be_exported(self):
+        Progress.report("WAIT FOR EXPORTED...")
+        WaitFor(self._envelope_is_in_state, 'Exported').to_return_value(
+            value=True)
+        Progress.report(" envelope is in Exported.\n")
+
     def wait_for_envelope_to_be_in_draft(self):
         Progress.report("WAIT FOR VALIDATION...")
         WaitFor(self._envelope_is_in_state, 'Draft').to_return_value(
@@ -72,12 +90,6 @@ class SubmissionManager:
         WaitFor(self._envelope_is_in_state, 'Complete').to_return_value(
             value=True)
         Progress.report(" envelope is in Complete.\n")
-
-    def wait_for_envelope_to_be_archived(self):
-        Progress.report("WAIT FOR ARCHIVED...")
-        WaitFor(self._envelope_is_in_state, 'Archived').to_return_value(
-            value=True)
-        Progress.report(" envelope is in Archived.\n")
 
     def _envelope_is_in_state(self, state):
         envelope_status = self.submission_envelope.reload().status()

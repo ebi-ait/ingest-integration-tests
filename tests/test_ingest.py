@@ -29,11 +29,11 @@ class TestIngest(unittest.TestCase):
         else:
             self.ingest_api_url = f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org"
 
-        self.ingest_client_api = IngestApi(url=self.ingest_api_url)
         self.s2s_token_client = S2STokenClient()
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         self.s2s_token_client.setup_from_file(gcp_credentials_file)
         self.token_manager = TokenManager(self.s2s_token_client)
+        self.ingest_client_api = IngestApi(url=self.ingest_api_url, token_manager=self.token_manager)
 
         self.ingest_broker = IngestBrokerAgent(self.deployment)
         self.ingest_api = IngestApiAgent(deployment=self.deployment)
@@ -49,15 +49,14 @@ class TestIngest(unittest.TestCase):
     def ingest_to_archives(self, dataset_name: str):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
-        runner.valid_run(dataset_fixture)
+        runner.archived_run(dataset_fixture)
         self.runner = runner
         return runner
 
     def ingest_to_terra(self, dataset_name):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         runner = DatasetRunner(self.deployment)
-        runner.valid_run(dataset_fixture)
-        # TODO implement test
+        runner.complete_run(dataset_fixture)
         self.runner = runner
         return runner
 
@@ -68,7 +67,7 @@ class TestIngest(unittest.TestCase):
         self.runner = runner
 
     def tearDown(self) -> None:
-        if not self.no_cleanup:
+        if not self.no_cleanup and self.runner and self.runner.submission_envelope:
             self.runner.submission_envelope.delete()
 
 
@@ -80,11 +79,13 @@ class TestRun(TestIngest):
     def test_big_submission_run(self):
         self.ingest_big_submission()
 
+    # cannot be run in prod, need to know how to delete the submitted data to archives
     def test_ingest_to_archives(self):
         runner = self.ingest_to_archives('SS2')
 
-    def test_exporting(self):
-        runner = self.ingest_to_terra()
+    # cannot be run in prod, need to know how to delete the submitted data to terra
+    def test_ingest_to_terra(self):
+        runner = self.ingest_to_terra('SS2')
 
 
 if __name__ == '__main__':

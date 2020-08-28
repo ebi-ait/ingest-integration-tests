@@ -30,11 +30,12 @@ class DatasetRunner:
     def archived_run(self, dataset_fixture, project_uuid=None):
         self.valid_run(dataset_fixture, project_uuid)
         self.submission_manager.submit_envelope(["Archive"])
-        self.submission_manager.wait_for_envelope_to_be_archived()
+        self.submission_manager.wait_for_envelope_to_be_archiving()
+    #     TODO implement request to archive
 
     def complete_run(self, dataset_fixture, project_uuid=None):
         self.valid_run(dataset_fixture, project_uuid)
-        self.submission_manager.submit_envelope()
+        self.submission_manager.submit_envelope(["Export", "Cleanup"])
         self.submission_manager.wait_for_envelope_to_complete()
 
     def upload_spreadsheet_and_create_submission(self, dataset_fixture, project_uuid=None):

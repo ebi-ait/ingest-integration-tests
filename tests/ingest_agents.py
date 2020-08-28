@@ -105,7 +105,7 @@ class IngestApiAgent:
                 submit_actions = []
 
             submit_url = self.url + '/submissionEvent'
-            r = requests.put(submit_url, headers=self.auth_headers, data=submit_actions)
+            r = requests.put(submit_url, headers=self.auth_headers, json=submit_actions)
             r.raise_for_status()
             return r
 
@@ -148,12 +148,12 @@ class IngestApiAgent:
             projects = self.get_projects()
             project = projects[0] if len(projects) > 0 else None
 
-            r = requests.delete(self.url)
+            r = requests.delete(self.url, headers=self.auth_headers, params={"force": True})
             r.raise_for_status()
 
             if project:
                 project_url = project['_links']['self']['href']
-                r = requests.delete(project_url)
+                r = requests.delete(project_url, headers=self.auth_headers)
                 r.raise_for_status()
 
         def _get_entity_list(self, entity_type):
