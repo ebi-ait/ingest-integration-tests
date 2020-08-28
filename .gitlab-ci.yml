@@ -8,7 +8,6 @@ test_ingest_to_upload:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
   only:
-    - task/test-archiving-and-exporting
     - dev
     - staging
   tags:
@@ -20,7 +19,6 @@ test_ingest_to_archives:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
   only:
-    - task/test-archiving-and-exporting
     - dev
     - staging
   tags:
@@ -32,7 +30,6 @@ test_ingest_to_terra:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
-    - task/test-archiving-and-exporting
     - dev
     - staging
   tags:
@@ -44,7 +41,6 @@ test_big_submission:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
-    - task/test-archiving-and-exporting
     - dev
     - staging
   tags:
@@ -58,7 +54,6 @@ before_script:
   - hca
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
   - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
-  - export DEPLOYMENT_ENV=dev
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
   - aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
   - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
