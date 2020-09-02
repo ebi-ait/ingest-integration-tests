@@ -71,19 +71,19 @@ class TestIngest(unittest.TestCase):
 
 class TestRun(TestIngest):
 
-    # def test_ss2_ingest_to_upload(self):
-    #     runner = self.ingest_and_upload_only('SS2')
-    #
-    # def test_big_submission_run(self):
-    #     self.ingest_big_submission()
+    def test_ss2_ingest_to_upload(self):
+        runner = self.ingest_and_upload_only('SS2')
+
+    def test_big_submission_run(self):
+        self.ingest_big_submission()
 
     # cannot be run in prod, need to know how to delete the submitted data to archives
     def test_ingest_to_archives(self):
         runner = self.ingest_to_archives('SS2')
 
-    # # cannot be run in prod, need to know how to delete the submitted data to terra
-    # def test_ingest_to_terra(self):
-    #     runner = self.ingest_to_terra('SS2')
+    # cannot be run in prod, need to know how to delete the submitted data to terra
+    def test_ingest_to_terra(self):
+        runner = self.ingest_to_terra('SS2')
 
 
 if __name__ == '__main__':
