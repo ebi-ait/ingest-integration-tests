@@ -65,7 +65,7 @@ class SubmissionManager:
         Progress.report("WAIT FOR ARCHIVING...")
         WaitFor(self._envelope_is_in_state, 'Archiving').to_return_value(
             value=True)
-        Progress.report(" envelope is in Archived.\n")
+        Progress.report(" envelope is in Archiving.\n")
 
     def wait_for_envelope_to_be_archived(self):
         Progress.report("WAIT FOR ARCHIVED...")
