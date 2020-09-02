@@ -45,9 +45,11 @@ class DatasetRunner:
             r.raise_for_status()
 
         self.ingest_archiver.archive_submission(self.submission_envelope.uuid)
-        self.dsp_submission_uuid = WaitFor(self.ingest_archiver.get_latest_dsp_submission_uuid,
-                                           self.submission_envelope.uuid).to_return_a_value_other_than(
+        archive_submission = WaitFor(self.ingest_archiver.get_latest_dsp_submission,
+                                     self.submission_envelope.uuid).to_return_a_value_other_than(
             other_than_value=None)
+        Progress.report(f"DSP SUBMISSION is created {archive_submission['dspUrl']}")
+        self.dsp_submission_uuid = archive_submission['dspUuid']
 
         if self.dsp_submission_uuid:
             WaitFor(self.ingest_archiver.is_valid_dsp_submission, self.dsp_submission_uuid).to_return_value(True)

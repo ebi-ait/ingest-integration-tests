@@ -256,7 +256,7 @@ class IngestArchiverAgent:
         archive_submission = self.ingest_api_agent.get_latest_archive_submission(ingest_submission_uuid)
         return archive_submission['dspUuid'] if archive_submission else None
 
-    def get_latest_dsp_submission_uuid(self, ingest_submission_uuid):
+    def get_latest_dsp_submission(self, ingest_submission_uuid):
         find_latest_url = f'{self.ingest_archiver_url}/latestArchiveSubmission/{ingest_submission_uuid}'
         r = requests.get(find_latest_url, headers=self.headers)
 
@@ -264,7 +264,7 @@ class IngestArchiverAgent:
             return None
 
         archive_submission = r.json()
-        return archive_submission['dspUuid'] if archive_submission else None
+        return archive_submission if archive_submission else None
 
     def is_valid_dsp_submission(self, dsp_submission_uuid):
         result = self.get_validation_errors(dsp_submission_uuid)
