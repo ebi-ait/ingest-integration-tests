@@ -260,7 +260,7 @@ class IngestArchiverAgent:
         find_latest_url = f'{self.ingest_archiver_url}/latestArchiveSubmission/{ingest_submission_uuid}'
         r = requests.get(find_latest_url, headers=self.headers)
 
-        if r.status_code == requests.status_codes.not_found:
+        if r.status_code == requests.codes.not_found:
             return None
 
         archive_submission = r.json()
