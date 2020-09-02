@@ -66,14 +66,30 @@ class IngestApiAgent:
         return IngestApiAgent.SubmissionEnvelope(envelope_id=envelope_id, ingest_api_url=self.ingest_api_url,
                                                  auth_headers=self.auth_headers, url=url)
 
-    class Project:
+    def get_latest_archive_submission(self, ingest_submission_uuid):
+        search_url = f'{self.ingest_api_url}/archiveSubmissions/search/findBySubmissionUuid'
+        params = {
+            "submissionUuid": ingest_submission_uuid,
+            "sort": "created,desc"
+        }
+        r = requests.get(search_url, headers=self.auth_headers, params=params)
+        r.raise_for_status()
+        data = r.json()
+        archive_submissions = data.get('_embedded', {}).get('archiveSubmissions', [])
+        latest_archive_submission = archive_submissions[0] if len(archive_submissions) > 0 else None
+        return latest_archive_submission
 
+    class Project:
         def __init__(self, source: dict = {}):
             self._source = deepcopy(source)
 
         def get_uuid(self):
             uuid = self._source.get('uuid')
             return uuid.get('uuid')  # because uuid's are structured as uuid.uuid in the source JSON
+
+        def get_url(self):
+            project_url = self._source.get('_links', {}).get('self', {}).get('href', None)
+            return project_url
 
     class SubmissionEnvelope:
 
@@ -100,9 +116,12 @@ class IngestApiAgent:
         def status(self):
             return self.data['submissionState']
 
-        def submit(self):
+        def submit(self, submit_actions=None):
+            if not submit_actions:
+                submit_actions = []
+
             submit_url = self.url + '/submissionEvent'
-            r = requests.put(submit_url, headers=self.auth_headers)
+            r = requests.put(submit_url, headers=self.auth_headers, json=submit_actions)
             r.raise_for_status()
             return r
 
@@ -145,12 +164,12 @@ class IngestApiAgent:
             projects = self.get_projects()
             project = projects[0] if len(projects) > 0 else None
 
-            r = requests.delete(self.url)
+            r = requests.delete(self.url, headers=self.auth_headers, params={"force": True})
             r.raise_for_status()
 
             if project:
                 project_url = project['_links']['self']['href']
-                r = requests.delete(project_url)
+                r = requests.delete(project_url, headers=self.auth_headers)
                 r.raise_for_status()
 
         def _get_entity_list(self, entity_type):
@@ -203,3 +222,63 @@ class IngestAuthAgent:
             "Authorization": f"Bearer {self._get_auth_token()}"
         }
         return headers
+
+
+class IngestArchiverAgent:
+    INGEST_ARCHIVER_URL_TEMPLATE = "https://archiver.ingest.{}.archive.data.humancellatlas.org"
+    INGEST_ARCHIVER_PROD_URL = "https://archiver.ingest.archive.data.humancellatlas.org"
+
+    def __init__(self, deployment: str, api_key: str, ingest_api_agent: IngestApiAgent):
+        self.deployment = deployment
+        self.api_key = api_key
+        self.ingest_api_agent = ingest_api_agent
+
+        if self.deployment == 'prod':
+            self.ingest_archiver_url = self.INGEST_ARCHIVER_PROD_URL
+        else:
+            self.ingest_archiver_url = self.INGEST_ARCHIVER_URL_TEMPLATE.format(self.deployment)
+
+        self.headers = {
+            'Api-Key': self.api_key
+        }
+
+    def archive_submission(self, ingest_submission_uuid: str):
+        data = {
+            'submission_uuid': ingest_submission_uuid,
+            'alias_prefix': 'INGEST_INTEGRATION_TEST',
+            'exclude_types': 'sequencingRun'
+        }
+        archive_submission_url = f'{self.ingest_archiver_url}/archiveSubmissions'
+        r = requests.post(archive_submission_url, json=data, headers=self.headers)
+        r.raise_for_status()
+
+    def get_dsp_submission_uuid(self, ingest_submission_uuid):
+        archive_submission = self.ingest_api_agent.get_latest_archive_submission(ingest_submission_uuid)
+        return archive_submission['dspUuid'] if archive_submission else None
+
+    def get_latest_dsp_submission(self, ingest_submission_uuid):
+        find_latest_url = f'{self.ingest_archiver_url}/latestArchiveSubmission/{ingest_submission_uuid}'
+        r = requests.get(find_latest_url, headers=self.headers)
+
+        if r.status_code == requests.codes.not_found:
+            return None
+
+        archive_submission = r.json()
+        return archive_submission if archive_submission else None
+
+    def is_valid_dsp_submission(self, dsp_submission_uuid):
+        result = self.get_validation_errors(dsp_submission_uuid)
+        errors = result.get('errors')
+        pending = result.get('pending')
+        return (len(errors) == 0) and (len(pending) == 0)
+
+    def get_validation_errors(self, dsp_submission_uuid):
+        get_validation_errors_url = f'{self.ingest_archiver_url}/archiveSubmissions/{dsp_submission_uuid}/validationErrors'
+        r = requests.get(get_validation_errors_url, headers=self.headers)
+        r.raise_for_status()
+        return r.json()
+
+    def complete_submission(self, dsp_submission_uuid):
+        complete_url = f'{self.ingest_archiver_url}/archiveSubmissions/{dsp_submission_uuid}/complete'
+        r = requests.post(complete_url, headers=self.headers)
+        r.raise_for_status()
