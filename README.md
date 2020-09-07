@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/badges/dev/pipeline.svg)](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/-/commits/dev)
+[![pipeline status](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/badges/staging/pipeline.svg)](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/-/commits/staging)
 
 
 # Ingest Integration Tests
