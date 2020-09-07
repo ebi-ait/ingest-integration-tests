@@ -1,4 +1,5 @@
-[![pipeline status](https://allspark.dev.data.humancellatlas.org/HumanCellAtlas/ingest-integration-tests/badges/dev/pipeline.svg)](https://allspark.dev.data.humancellatlas.org/HumanCellAtlas/ingest-integration-tests/commits/dev)
+[![pipeline status](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/badges/staging/pipeline.svg)](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/-/commits/staging)
+
 
 # Ingest Integration Tests
 Integration tests for ingest and upload run in non-production environments.
@@ -21,10 +22,12 @@ made locally available. The GCP credentials are stored in AWS Secrets Manager; o
 environment. To retrieve GCP credentials, the AWS CLI can be used:
 
 ```
-aws --profile=hca secretsmanager get-secret-value\
-    --region us-east-1\ 
-    --secret-id dcp/ingest/dev/gcp-credentials.json\
-    --query SecretString | jq -rc '.' > _local/gcp-credentials-dev.json
+ aws secretsmanager get-secret-value \
+    --profile=embl-ebi \
+    --region us-east-1 \
+    --secret-id ingest/dev/secrets \
+    --query SecretString \
+    --output text | jq -jr '.exporter_auth_info' > _local/gcp-credentials-dev.json
 ```
 
 **IMPORTANT**: Store the credentials file in a secured location. Make sure to not commit it to version control. 
@@ -43,9 +46,10 @@ To run a single test, make sure that all necessary environment variables are pro
 commonly required variables are `DEPLOYMENT_ENV` and `GOOGLE_APPLICATION_CREDENTIALS`.
 
 ```
+export AWS_PROFILE=embl-ebi \
 export DEPLOYMENT_ENV=dev; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
-python3 -m unittest tests.test_add_bundle.AddBundleTest.test_run
+python3 -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
 ``` 
 
 #### Gitlab Runner
