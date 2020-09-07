@@ -2,7 +2,7 @@ iso8601
 requests
 urllib3
 hca
--e "git+https://github.com/HumanCellAtlas/ingest-client.git@dd9bb7d#egg=hca_ingest"
+-e git+https://github.com/ebi-ait/ingest-client.git@c8291a17#egg=hca_ingest
 awscli
 nose
 openpyxl
