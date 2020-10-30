@@ -37,7 +37,7 @@ class BigSubmissionRunner:
                                                  'biomaterials')
 
         self.submission_manager = SubmissionManager(self.submission_envelope)
-        self.submission_manager.wait_for_envelope_to_be_in_draft()
+        self.submission_manager.wait_for_envelope_to_be_invalid()
         self.submission_manager.get_upload_area_credentials()
         self.submission_manager.select_upload_area()
         self.submission_manager.upload_files(f'{metadata_fixture.data_files_location}{filename}')
