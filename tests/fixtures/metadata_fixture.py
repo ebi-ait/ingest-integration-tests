@@ -11,4 +11,4 @@ class MetadataFixture:
         self.sequence_file = load_file(
             f'{dir_path}/metadata/sequence_file.json')
 
-        self.data_files_location = 's3://org-humancellatlas-dcp-test-data/10x/'
+        self.data_files_location = 's3://hca-util-upload-area/3125f4a0-dda1-40c6-ab69-d27f795f08e1/'
