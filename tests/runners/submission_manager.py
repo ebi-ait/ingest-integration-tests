@@ -85,7 +85,7 @@ class SubmissionManager:
             value=True)
         Progress.report(" envelope is in Draft.\n")
 
-    def wait_for_envelope_to_be_in_invalid(self):
+    def wait_for_envelope_to_be_invalid(self):
         Progress.report("WAIT FOR VALIDATION...")
         WaitFor(self._envelope_is_in_state, 'Invalid').to_return_value(
             value=True)
