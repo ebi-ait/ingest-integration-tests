@@ -56,6 +56,7 @@ before_script:
   - apt-get -y install awscli
   - pip install -r requirements.txt
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
+  - INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
   - export DEPLOYMENT_ENV=dev
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
   - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
