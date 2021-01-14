@@ -10,6 +10,7 @@ test_ingest_to_upload:
   only:
     - dev
     - staging
+    - task/hca-util
   tags:
     - ingest-integration-tests
 
@@ -21,6 +22,7 @@ test_ingest_to_archives:
   only:
     - dev
     - staging
+    - task/hca-util
   tags:
     - ingest-integration-tests
 
@@ -32,6 +34,7 @@ test_ingest_to_terra:
   only:
     - dev
     - staging
+    - task/hca-util
   tags:
     - ingest-integration-tests
 
@@ -43,6 +46,7 @@ test_big_submission:
   only:
     - dev
     - staging
+    - task/hca-util
   tags:
     - ingest-integration-tests
 
