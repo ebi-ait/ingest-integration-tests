@@ -23,6 +23,8 @@ class BigSubmissionRunner:
         submission_url = submission["_links"]["self"]["href"]
         self.submission_envelope = self.ingest_api.envelope(envelope_id=None, url=submission_url)
 
+        # TODO just use the test spreadsheet here instead of constructing the json
+        # the schema version has a risk of being outdated here
         project = metadata_fixture.project
         biomaterial = metadata_fixture.biomaterial
         file = dict(metadata_fixture.sequence_file)
