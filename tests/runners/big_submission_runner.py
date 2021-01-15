@@ -1,3 +1,5 @@
+import copy
+
 from ingest.api.ingestapi import IngestApi
 from ingest.utils.token_manager import TokenManager
 
@@ -27,8 +29,8 @@ class BigSubmissionRunner:
         # the schema version has a risk of being outdated here
         project = metadata_fixture.project
         biomaterial = metadata_fixture.biomaterial
-        file = dict(metadata_fixture.sequence_file)
-        file2 = dict(metadata_fixture.sequence_file)
+        file = copy.deepcopy(metadata_fixture.sequence_file)
+        file2 = copy.deepcopy(metadata_fixture.sequence_file)
         filename = 'SRR3562314_1.fastq.gz'
         filename2 = 'SRR3562314_2.fastq.gz'
         file['file_core']['file_name'] = filename
@@ -40,6 +42,7 @@ class BigSubmissionRunner:
 
         for i in range(METADATA_COUNT):
             self.ingest_client_api.create_entity(submission_url,
+                                                 {'content': biomaterial},
                                                  biomaterial,
                                                  'biomaterials')
 
