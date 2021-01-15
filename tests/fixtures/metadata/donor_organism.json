@@ -1,5 +1,5 @@
 {
-    "describedBy": "https://schema.integration.data.humancellatlas.org/type/biomaterial/14.0.7/donor_organism",
+    "describedBy": "https://schema.humancellatlas.org/type/biomaterial/14.0.7/donor_organism",
     "schema_type": "biomaterial",
     "biomaterial_core": {
         "biomaterial_id": "donor_ID_1",
