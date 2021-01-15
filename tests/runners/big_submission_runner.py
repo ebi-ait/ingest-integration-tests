@@ -43,7 +43,6 @@ class BigSubmissionRunner:
         for i in range(METADATA_COUNT):
             self.ingest_client_api.create_entity(submission_url,
                                                  {'content': biomaterial},
-                                                 biomaterial,
                                                  'biomaterials')
 
         self.submission_manager = SubmissionManager(self.submission_envelope)
