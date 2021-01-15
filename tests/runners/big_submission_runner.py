@@ -25,11 +25,16 @@ class BigSubmissionRunner:
 
         project = metadata_fixture.project
         biomaterial = metadata_fixture.biomaterial
-        file = metadata_fixture.sequence_file
-        filename = metadata_fixture.sequence_file['file_core']['file_name']
+        file = dict(metadata_fixture.sequence_file)
+        file2 = dict(metadata_fixture.sequence_file)
+        filename = 'SRR3562314_1.fastq.gz'
+        filename2 = 'SRR3562314_2.fastq.gz'
+        file['file_core']['file_name'] = filename
+        file2['file_core']['file_name'] = filename2
 
         self.ingest_client_api.create_project(submission_url, project)
         self.ingest_client_api.create_file(submission_url, filename, file)
+        self.ingest_client_api.create_file(submission_url, filename2, file2)
 
         for i in range(METADATA_COUNT):
             self.ingest_client_api.create_entity(submission_url,
@@ -39,7 +44,5 @@ class BigSubmissionRunner:
         self.submission_manager = SubmissionManager(self.submission_envelope)
         self.submission_manager.wait_for_envelope_to_be_invalid()
         self.submission_manager.get_upload_area_credentials()
-        self.submission_manager.select_upload_area()
-        self.submission_manager.upload_files(f'{metadata_fixture.data_files_location}{filename}')
-        self.submission_manager.forget_about_upload_area()
+        self.submission_manager.stage_data_files(f'{metadata_fixture.data_files_upload_area_uuid}')
         self.submission_manager.wait_for_envelope_to_be_validated()
