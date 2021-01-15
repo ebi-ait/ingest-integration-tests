@@ -1,3 +1,4 @@
+import os
 import subprocess
 import time
 from urllib.parse import urlparse
@@ -7,7 +8,13 @@ from requests import HTTPError
 from tests.utils import Progress
 from tests.wait_for import WaitFor
 
+from tests.utils import run_command
+
 MINUTE = 60
+
+HCA_UTIL_ADMIN_PROFILE = os.environ.get('HCA_UTIL_ADMIN_PROFILE')
+HCA_UTIL_ADMIN_ACCESS = os.environ.get('HCA_UTIL_ADMIN_ACCESS')
+HCA_UTIL_ADMIN_SECRET = os.environ.get('HCA_UTIL_ADMIN_SECRET')
 
 
 class SubmissionManager:
@@ -26,28 +33,18 @@ class SubmissionManager:
     def _get_upload_area_credentials(self):
         return self.submission_envelope.reload().upload_credentials()
 
-    def stage_data_files(self, files):
+    def stage_data_files(self, upload_area_uuid):
         Progress.report("STAGING FILES...\n")
-        self._stage_data_files_using_s3_sync(files)
+        self._stage_data_files_using_s3_sync(upload_area_uuid)
 
-    def _stage_data_files_using_s3_sync(self, files):
-        Progress.report("STAGING FILES using hca cli...")
-        self.select_upload_area()
-        self.upload_files(files)
-        self.forget_about_upload_area()
-
-    def select_upload_area(self):
-        self._run_command(['hca', 'upload', 'select', self.upload_credentials])
-
-    def upload_files(self, files):
-        self._run_command(['hca', 'upload', 'files', files])
+    def _stage_data_files_using_s3_sync(self, upload_area_uuid):
+        Progress.report("STAGING FILES using hca-util cli...")
+        self._run_command(f'hca-util config {HCA_UTIL_ADMIN_ACCESS} {HCA_UTIL_ADMIN_SECRET} --profile {HCA_UTIL_ADMIN_PROFILE}', verbose=False)
+        self._run_command(f'hca-util select {upload_area_uuid} --profile {HCA_UTIL_ADMIN_PROFILE}')
+        self._run_command(f'hca-util sync {self.upload_credentials} --profile {HCA_UTIL_ADMIN_PROFILE}')
 
     def submit_envelope(self, submit_actions=None):
         self.submission_envelope.submit(submit_actions)
-
-    def forget_about_upload_area(self):
-        self.upload_area_uuid = urlparse(self.upload_credentials).path.split('/')[1]
-        self._run_command(['hca', 'upload', 'forget', self.upload_area_uuid])
 
     def wait_for_envelope_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")
@@ -117,11 +114,9 @@ class SubmissionManager:
                 raise
 
     @staticmethod
-    def _run_command(cmd_and_args_list, expected_retcode=0):
-        retcode = subprocess.call(cmd_and_args_list)
+    def _run_command(cmd:str, expected_retcode=0, verbose=True):
+        retcode, output, error = run_command(cmd, verbose=verbose)
         if retcode != 0:
-            raise Exception(
-                "Unexpected return code from '{command}', expected {expected_retcode} got {actual_retcode}".format(
-                    command=" ".join(cmd_and_args_list), expected_retcode=expected_retcode, actual_retcode=retcode
-                )
-            )
+            raise Exception(f"Unexpected return code from '{cmd}', expected {expected_retcode} got {retcode}")
+
+

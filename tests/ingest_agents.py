@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 
 import requests
-from ingest.utils.s2s_token_client import S2STokenClient
+from ingest.utils.s2s_token_client import S2STokenClient, ServiceCredential
 from ingest.utils.token_manager import TokenManager
 
 
@@ -198,10 +198,10 @@ class IngestAuthAgent:
         """This class controls the authentication actions with Ingest Service, including retrieving the token,
          store the token and make authenticated headers. Note:
         """
-        self.s2s_token_client = S2STokenClient()
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-
-        self.s2s_token_client.setup_from_file(gcp_credentials_file)
+        credential = ServiceCredential.from_file(gcp_credentials_file)
+        audience = os.environ.get('INGEST_API_JWT_AUDIENCE', 'https://dev.data.humancellatlas.org/')
+        self.s2s_token_client = S2STokenClient(credential, audience)
         self.token_manager = TokenManager(token_client=self.s2s_token_client)
 
     def _get_auth_token(self):
