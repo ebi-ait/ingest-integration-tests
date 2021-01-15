@@ -10,7 +10,6 @@ test_ingest_to_upload:
   only:
     - dev
     - staging
-    - task/hca-util
   tags:
     - ingest-integration-tests
 
@@ -54,7 +53,7 @@ before_script:
   - pip install -r requirements.txt
   - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
   - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
-  - export DEPLOYMENT_ENV=dev
+  - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
   - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
   - export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_ACCESS_KEY')
