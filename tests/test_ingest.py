@@ -3,7 +3,7 @@ import os
 import unittest
 
 from ingest.api.ingestapi import IngestApi
-from ingest.utils.s2s_token_client import S2STokenClient
+from ingest.utils.s2s_token_client import S2STokenClient, ServiceCredential
 from ingest.utils.token_manager import TokenManager
 
 from tests.fixtures.dataset_fixture import DatasetFixture
@@ -30,9 +30,10 @@ class TestIngest(unittest.TestCase):
         else:
             self.ingest_api_url = f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org"
 
-        self.s2s_token_client = S2STokenClient()
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-        self.s2s_token_client.setup_from_file(gcp_credentials_file)
+        credential = ServiceCredential.from_file(gcp_credentials_file)
+        audience = os.environ.get('INGEST_API_JWT_AUDIENCE')
+        self.s2s_token_client = S2STokenClient(credential, audience)
         self.token_manager = TokenManager(self.s2s_token_client)
         self.ingest_client_api = IngestApi(url=self.ingest_api_url, token_manager=self.token_manager)
         self.ingest_broker = IngestBrokerAgent(self.deployment)

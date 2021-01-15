@@ -28,7 +28,7 @@ class DatasetRunner:
         self.upload_spreadsheet_and_create_submission(dataset_fixture, project_uuid)
         self.submission_manager = SubmissionManager(self.submission_envelope)
         self.submission_manager.get_upload_area_credentials()
-        self.submission_manager.stage_data_files(self.dataset.config['data_files_location'])
+        self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
         self.submission_manager.wait_for_envelope_to_be_validated()
 
     def archived_run(self, dataset_fixture):

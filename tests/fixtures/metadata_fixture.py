@@ -10,5 +10,4 @@ class MetadataFixture:
         self.project = load_file(f'{dir_path}/metadata/project.json')
         self.sequence_file = load_file(
             f'{dir_path}/metadata/sequence_file.json')
-
-        self.data_files_location = 's3://org-humancellatlas-dcp-test-data/10x/'
+        self.data_files_upload_area_uuid = "3125f4a0-dda1-40c6-ab69-d27f795f08e1"
