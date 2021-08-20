@@ -1,4 +1,5 @@
 import requests
+from ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
 
 SHEET_CHANGE_VALUE = ' SHEET UPDATE'
@@ -8,13 +9,12 @@ VALUE_ROW_NUMBER = 6
 
 class BulkUpdateManager:
 
-    def __init__(self, ingest_api, ingest_url):
+    def __init__(self, ingest_api: IngestApi):
         self.ingest_api = ingest_api
-        self.ingest_url = ingest_url
+        self.ingest_url = ingest_api.url
 
-    @staticmethod
     def get_entities_by_submission_id_and_type(self, submission_id, entity_type):
-        response = requests.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}').json()
+        response = self.ingest_api.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}').json()
         return response.get('_embedded').get(entity_type)
 
     @staticmethod
