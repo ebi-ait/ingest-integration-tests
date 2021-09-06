@@ -31,7 +31,7 @@ class DatasetFixture:
         branch = self.deployment
 
         if self.deployment == 'dev':
-            branch = 'develop'
+            branch = 'staging'
 
         if self.deployment == 'prod':
             branch = 'master'
