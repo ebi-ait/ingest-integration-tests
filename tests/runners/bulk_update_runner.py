@@ -9,6 +9,8 @@ from tests.runners.bulk_update_manager import BulkUpdateManager
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
+MODIFIED_BSD_ACCESSION_ID = '999'
+
 UI_CHANGE_VALUE = 'UI CHANGE '
 
 
@@ -31,7 +33,7 @@ class BulkUpdateRunner:
         updated_project_description, updated_contributor_name, updated_bsd_accession = \
             self.__modify_metadata_with_api_calls()
         update_spreadsheet, updated_spreadsheet_path = self.__download_modified_spreadsheet()
-        updated_project_title, updated_biomaterial_name, modified_biomaterial_id =\
+        updated_project_title, updated_biomaterial_name, modified_biomaterial_id = \
             self.__modify_metadata_in_sheet(update_spreadsheet)
         self.bulk_update_manager.save_modified_spreadsheet(update_spreadsheet, updated_spreadsheet_path)
         self.__upload_modified_spreadsheet(updated_spreadsheet_path)
@@ -62,24 +64,26 @@ class BulkUpdateRunner:
         project_payload = self.__get_project_content()
         self.project_id = self.bulk_update_manager.get_id_from_entity(project_payload)
 
-        self.biomaterial_content_by_id: dict = self.__get_biomaterial_content_by_id()
-        self.biomaterial_ids = self.biomaterial_content_by_id.keys()
+        self.__get_biomaterial_content_by_id()
+        self.biomaterial_ids = [*self.biomaterial_content_by_id]
 
     def __get_project_content(self):
         project_payload = \
             self.bulk_update_manager.get_entities_by_submission_id_and_type(self.submission_id, 'projects')[0]
-        self.original_project_content = project_payload.get('content')
+        self.project_content = project_payload.get('content')
         return project_payload
 
     def __get_biomaterial_content_by_id(self):
         biomaterials_payload = \
             self.bulk_update_manager.get_entities_by_submission_id_and_type(self.submission_id, 'biomaterials')
-        return {self.bulk_update_manager.get_id_from_entity(payload): payload.get('content')
-                for payload in biomaterials_payload}
+        self.biomaterial_content_by_id = {
+            self.bulk_update_manager.get_id_from_entity(payload): payload.get('content')
+            for payload in biomaterials_payload
+        }
 
     def __modify_metadata_with_api_calls(self):
         # simulated by REST calls
-        project_content_with_ui_modification = deepcopy(self.original_project_content)
+        project_content_with_ui_modification = deepcopy(self.project_content)
         updated_project_description = UI_CHANGE_VALUE + project_content_with_ui_modification.get('project_core').get(
             'project_description')
         project_content_with_ui_modification['project_core']['project_description'] = updated_project_description
@@ -89,7 +93,8 @@ class BulkUpdateRunner:
 
         biomaterial_content_with_ui_modification = deepcopy(list(self.biomaterial_content_by_id.values())[0])
         updated_bsd_accession = \
-            UI_CHANGE_VALUE + biomaterial_content_with_ui_modification['biomaterial_core']['biosamples_accession']
+            biomaterial_content_with_ui_modification['biomaterial_core']['biosamples_accession'] \
+            + MODIFIED_BSD_ACCESSION_ID
         biomaterial_content_with_ui_modification['biomaterial_core']['biosamples_accession'] = updated_bsd_accession
         self.bulk_update_manager.update_content(
             'biomaterials', self.biomaterial_ids[0], biomaterial_content_with_ui_modification)
@@ -117,13 +122,14 @@ class BulkUpdateRunner:
         return updated_project_title, updated_biomaterial_name, modified_biomaterial_id
 
     def __validate_modifications(self, updated_project_description, updated_contributor_name, updated_bsd_accession,
-                                      updated_project_title, updated_biomaterial_name):
-        project_content = self.__get_project_content()
+                                 updated_project_title, updated_biomaterial_name):
+        self.__get_project_content()
 
-        assert updated_project_description == project_content['project_core']['project_description']
-        assert updated_project_title == project_content['project_core']['project_title']
-        assert updated_contributor_name == project_content['contributors'][0]['name']
+        assert updated_project_description == self.project_content['project_core']['project_description']
+        assert updated_project_title == self.project_content['project_core']['project_title']
+        assert updated_contributor_name == self.project_content['contributors'][0]['name']
 
+        self.__get_biomaterial_content_by_id()
         biomaterial1_content = self.biomaterial_content_by_id.get(self.biomaterial_ids[0])
         biomaterial2_content = self.biomaterial_content_by_id.get(self.biomaterial_ids[1])
         assert updated_bsd_accession == biomaterial1_content['biomaterial_core']['biosamples_accession']
