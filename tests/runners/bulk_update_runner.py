@@ -1,4 +1,5 @@
 import os
+import time
 from copy import deepcopy
 
 from openpyxl import load_workbook, Workbook
@@ -123,6 +124,7 @@ class BulkUpdateRunner:
 
     def __validate_modifications(self, updated_project_description, updated_contributor_name, updated_bsd_accession,
                                  updated_project_title, updated_biomaterial_name):
+        time.sleep(5)
         self.__get_project_content()
 
         assert updated_project_description == self.project_content['project_core']['project_description']
