@@ -43,7 +43,7 @@ class BulkUpdateManager:
         return updated_biomaterial_name, modified_biomaterial_id
 
     @staticmethod
-    def save_modified_spreadsheet(path_to_spreadsheet, spreadsheet):
+    def save_modified_spreadsheet(spreadsheet, path_to_spreadsheet):
         spreadsheet.save(path_to_spreadsheet)
 
     @staticmethod
