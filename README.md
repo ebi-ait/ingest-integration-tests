@@ -23,11 +23,8 @@ environment. To retrieve GCP credentials, the AWS CLI can be used:
 
 ```
  aws secretsmanager get-secret-value \
-    --profile=embl-ebi \
-    --region us-east-1 \
-    --secret-id ingest/dev/secrets \
-    --query SecretString \
-    --output text | jq -jr '.exporter_auth_info' > _local/gcp-credentials-dev.json
+ --region us-east-1 \
+ --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
 ```
 
 **IMPORTANT**: Store the credentials file in a secured location. Make sure to not commit it to version control. 
@@ -36,18 +33,17 @@ ignored by the version control system.
 
 ##### Running a Single Test
 
-If you haven't already done so, you will need to configure the HCA CLI tool to use the EBI installation of the upload service rather than the DCP (default) version.
+To run a single test, make sure that all necessary environment variables are provided.
 
 ```
-./setup_ingest_config.sh
-```
-
-To run a single test, make sure that all necessary environment variables are provided. At the time of writing, the most
-commonly required variables are `DEPLOYMENT_ENV` and `GOOGLE_APPLICATION_CREDENTIALS`.
-
-```
-export AWS_PROFILE=embl-ebi \
+export AWS_PROFILE=embl-ebi; \
 export DEPLOYMENT_ENV=dev; \
+export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/; \
+export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}; \
+export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key'); \
+export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_ACCESS_KEY'); \
+export HCA_UTIL_ADMIN_SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_SECRET_ACCESS_KEY'); \
+export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
 python3 -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
 ``` 
