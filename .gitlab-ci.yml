@@ -46,6 +46,17 @@ test_big_submission:
   tags:
     - ingest-integration-tests
 
+test_bulk_update:
+  stage: test
+  script:
+     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
+  only:
+    - dev
+    - staging
+  tags:
+    - ingest-integration-tests
+
+
 before_script:
   - apt-get -y update
   - apt-get -y install jq
