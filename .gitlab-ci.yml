@@ -46,12 +46,22 @@ test_big_submission:
   tags:
     - ingest-integration-tests
 
+test_bulk_update:
+  stage: test
+  script:
+     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
+  only:
+    - dev
+    - staging
+  tags:
+    - ingest-integration-tests
+
+
 before_script:
   - apt-get -y update
   - apt-get -y install jq
   - apt-get -y install awscli
   - pip install -r requirements.txt
-  - chmod a+x setup_ingest_config.sh && ./setup_ingest_config.sh
   - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
   - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
