@@ -10,6 +10,8 @@ from tests.fixtures.dataset_fixture import DatasetFixture
 from tests.fixtures.metadata_fixture import MetadataFixture
 from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent
 from tests.runners.big_submission_runner import BigSubmissionRunner
+from tests.runners.bulk_update_manager import BulkUpdateManager
+from tests.runners.bulk_update_runner import BulkUpdateRunner
 from tests.runners.dataset_runner import DatasetRunner
 
 DEPLOYMENTS = ('dev', 'integration', 'staging', 'prod')
@@ -39,6 +41,7 @@ class TestIngest(unittest.TestCase):
         self.ingest_broker = IngestBrokerAgent(self.deployment)
         self.ingest_api = IngestApiAgent(deployment=self.deployment)
         self.ingest_archiver = IngestArchiverAgent(self.deployment, self.archiver_api_key, self.ingest_api)
+        self.bulk_update_manager = BulkUpdateManager(self.ingest_client_api)
         self.runner = None
 
     def ingest_and_upload_only(self, dataset_name):
@@ -65,6 +68,11 @@ class TestIngest(unittest.TestCase):
         self.runner.run(metadata_fixture)
         return self.runner
 
+    def bulk_update(self, dataset_name):
+        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
+        self.runner = BulkUpdateRunner(self.ingest_broker, self.ingest_api, self.bulk_update_manager)
+        self.runner.bulk_update_run(dataset_fixture)
+
     def tearDown(self) -> None:
         if not self.no_cleanup and self.runner and self.runner.submission_envelope:
             self.runner.submission_envelope.delete()
@@ -85,6 +93,9 @@ class TestRun(TestIngest):
     # cannot be run in prod, need to know how to delete the submitted data to terra
     def test_ingest_to_terra(self):
         runner = self.ingest_to_terra('SS2')
+
+    def test_bulk_update(self):
+        self.bulk_update('SS2')
 
 
 if __name__ == '__main__':
