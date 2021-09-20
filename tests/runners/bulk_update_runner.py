@@ -10,7 +10,7 @@ from tests.runners.bulk_update_manager import BulkUpdateManager
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
-MODIFIED_BSD_ACCESSION_ID = '999'
+MODIFIED_INSDC_ACCESSION_ID = '999'
 
 UI_CHANGE_VALUE = 'UI CHANGE '
 
@@ -31,14 +31,14 @@ class BulkUpdateRunner:
     def bulk_update_run(self, dataset_fixture):
         self.__import_spreadsheet_with_files(dataset_fixture)
         self.__get_original_content()
-        updated_project_description, updated_contributor_name, updated_bsd_accession = \
+        updated_project_description, updated_contributor_name, updated_insdc_accession = \
             self.__modify_metadata_with_api_calls()
         update_spreadsheet, updated_spreadsheet_path = self.__download_modified_spreadsheet()
         updated_project_title, updated_biomaterial_name, modified_biomaterial_id = \
             self.__modify_metadata_in_sheet(update_spreadsheet)
         self.bulk_update_manager.save_modified_spreadsheet(update_spreadsheet, updated_spreadsheet_path)
         self.__upload_modified_spreadsheet(updated_spreadsheet_path)
-        self.__validate_modifications(updated_project_description, updated_contributor_name, updated_bsd_accession,
+        self.__validate_modifications(updated_project_description, updated_contributor_name, updated_insdc_accession,
                                       updated_project_title, updated_biomaterial_name)
 
     def __import_spreadsheet_with_files(self, dataset_fixture, project_uuid=None):
@@ -93,14 +93,14 @@ class BulkUpdateRunner:
         self.bulk_update_manager.update_content('projects', self.project_id, project_content_with_ui_modification)
 
         biomaterial_content_with_ui_modification = deepcopy(list(self.biomaterial_content_by_id.values())[0])
-        updated_bsd_accession = \
-            biomaterial_content_with_ui_modification['biomaterial_core']['biosamples_accession'] \
-            + MODIFIED_BSD_ACCESSION_ID
-        biomaterial_content_with_ui_modification['biomaterial_core']['biosamples_accession'] = updated_bsd_accession
+        updated_insdc_accession = \
+            biomaterial_content_with_ui_modification['biomaterial_core']['insdc_sample_accession'] \
+            + MODIFIED_INSDC_ACCESSION_ID
+        biomaterial_content_with_ui_modification['biomaterial_core']['insdc_sample_accession'] = updated_insdc_accession
         self.bulk_update_manager.update_content(
             'biomaterials', self.biomaterial_ids[0], biomaterial_content_with_ui_modification)
 
-        return updated_project_description, updated_contributor_name, updated_bsd_accession
+        return updated_project_description, updated_contributor_name, updated_insdc_accession
 
     def __download_modified_spreadsheet(self):
         submission_uuid = self.submission_envelope.uuid
@@ -122,7 +122,7 @@ class BulkUpdateRunner:
 
         return updated_project_title, updated_biomaterial_name, modified_biomaterial_id
 
-    def __validate_modifications(self, updated_project_description, updated_contributor_name, updated_bsd_accession,
+    def __validate_modifications(self, updated_project_description, updated_contributor_name, updated_insdc_accession,
                                  updated_project_title, updated_biomaterial_name):
         time.sleep(5)
         self.__get_project_content()
@@ -134,5 +134,5 @@ class BulkUpdateRunner:
         self.__get_biomaterial_content_by_id()
         biomaterial1_content = self.biomaterial_content_by_id.get(self.biomaterial_ids[0])
         biomaterial2_content = self.biomaterial_content_by_id.get(self.biomaterial_ids[1])
-        assert updated_bsd_accession == biomaterial1_content['biomaterial_core']['biosamples_accession']
+        assert updated_insdc_accession == biomaterial1_content['biomaterial_core']['insdc_sample_accession']
         assert updated_biomaterial_name == biomaterial2_content['biomaterial_core']['biomaterial_name']
