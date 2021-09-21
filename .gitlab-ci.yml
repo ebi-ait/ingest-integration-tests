@@ -53,6 +53,7 @@ test_bulk_update:
   only:
     - dev
     - staging
+    - prod
   tags:
     - ingest-integration-tests
 
