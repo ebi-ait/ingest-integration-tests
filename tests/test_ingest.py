@@ -14,6 +14,8 @@ from tests.runners.bulk_update_manager import BulkUpdateManager
 from tests.runners.bulk_update_runner import BulkUpdateRunner
 from tests.runners.dataset_runner import DatasetRunner
 
+SS2_DATASET_NAME = 'SS2'
+
 DEPLOYMENTS = ('dev', 'integration', 'staging', 'prod')
 
 
@@ -87,24 +89,24 @@ class TestIngest(unittest.TestCase):
 class TestRun(TestIngest):
 
     def test_ss2_ingest_to_upload(self):
-        self.ingest_and_upload_only('SS2')
+        self.ingest_and_upload_only(SS2_DATASET_NAME)
 
     def test_big_submission_run(self):
         self.ingest_big_submission()
 
     # cannot be run in prod, need to know how to delete the submitted data to archives
     def test_ingest_to_archives(self):
-        self.ingest_to_archives('SS2')
+        self.ingest_to_archives(SS2_DATASET_NAME)
 
     def test_direct_archiving(self):
-        self.ingest_to_direct_archives('SS2')
+        self.ingest_to_direct_archives(SS2_DATASET_NAME)
 
     # cannot be run in prod, need to know how to delete the submitted data to terra
     def test_ingest_to_terra(self):
-        self.ingest_to_terra('SS2')
+        self.ingest_to_terra(SS2_DATASET_NAME)
 
     def test_bulk_update(self):
-        self.bulk_update('SS2')
+        self.bulk_update(SS2_DATASET_NAME)
 
 
 if __name__ == '__main__':

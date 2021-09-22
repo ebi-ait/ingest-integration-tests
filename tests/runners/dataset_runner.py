@@ -9,6 +9,8 @@ from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 from tests.wait_for import WaitFor
 
+RELEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
 BIOSAMPLES_PREFIX = 'SAME'
 
 
@@ -81,7 +83,7 @@ class DatasetRunner:
             project = projects[0]
             project_url = project.get_url()
             now = datetime.now()
-            r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime('%Y-%m-%dT%H:%M:%SZ')})
+            r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
             r.raise_for_status()
 
     def __create_archive_submission_payload(self, is_direct: bool):
