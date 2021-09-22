@@ -9,6 +9,8 @@ from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 from tests.wait_for import WaitFor
 
+BIOSAMPLES_PREFIX = 'SAME'
+
 
 class DatasetRunner:
     def __init__(self, ingest_broker: IngestBrokerAgent, ingest_api: IngestApiAgent,
@@ -31,20 +33,19 @@ class DatasetRunner:
         self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
         self.submission_manager.wait_for_envelope_to_be_validated()
 
+    def direct_archived_run(self, dataset_fixture):
+        self.__submit_archive_submission(dataset_fixture)
+
+        payload = self.__create_archive_submission_payload(True)
+        self.ingest_archiver.archive_submission(payload)
+
+        self.__check_accessions(self.submission_id)
+
     def archived_run(self, dataset_fixture):
-        self.valid_run(dataset_fixture)
-        self.submission_manager.submit_envelope(["Archive"])
-        self.submission_manager.wait_for_envelope_to_be_archiving()
+        self.__submit_archive_submission(dataset_fixture)
 
-        projects = self.submission_envelope.retrieve_projects()
-        if len(projects) > 0:
-            project = projects[0]
-            project_url = project.get_url()
-            now = datetime.now()
-            r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime('%Y-%m-%dT%H:%M:%SZ')})
-            r.raise_for_status()
-
-        self.ingest_archiver.archive_submission(self.submission_envelope.uuid)
+        payload = self.__create_archive_submission_payload(False)
+        self.ingest_archiver.archive_submission(payload)
         archive_submission = WaitFor(self.ingest_archiver.get_latest_dsp_submission,
                                      self.submission_envelope.uuid).to_return_a_value_other_than(
             other_than_value=None)
@@ -70,3 +71,40 @@ class DatasetRunner:
                                                        project_uuid=project_uuid)
         Progress.report(f"submission is in {self.ingest_api.ingest_api_url}/submissionEnvelopes/{self.submission_id}\n")
         self.submission_envelope = self.ingest_api.envelope(self.submission_id)
+
+    def __submit_archive_submission(self, dataset_fixture):
+        self.valid_run(dataset_fixture)
+        self.submission_manager.submit_envelope(["Archive"])
+        self.submission_manager.wait_for_envelope_to_be_archiving()
+        projects = self.submission_envelope.retrieve_projects()
+        if len(projects) > 0:
+            project = projects[0]
+            project_url = project.get_url()
+            now = datetime.now()
+            r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime('%Y-%m-%dT%H:%M:%SZ')})
+            r.raise_for_status()
+
+    def __create_archive_submission_payload(self, is_direct: bool):
+        payload = {
+            'submission_uuid': self.submission_envelope.uuid,
+            'alias_prefix': 'INGEST_INTEGRATION_TEST',
+            'exclude_types': 'sequencingRun'
+        }
+
+        if is_direct:
+            payload['is_direct_archiving'] = True
+
+        return payload
+
+    def __check_accessions(self, submission_id):
+        time.sleep(10)
+        submission_envelope: IngestApiAgent.SubmissionEnvelope = self.ingest_api.envelope(envelope_id=submission_id)
+        biomaterials = submission_envelope.get_biomaterials()
+        biosamples_accessions = list(map(
+            lambda biomaterial: biomaterial['content']['biomaterial_core']['biosamples_accession'],
+            submission_envelope.get_biomaterials()
+        ))
+        assert len(biosamples_accessions) == len(biomaterials)
+        biosamples_accession: str
+        for biosamples_accession in biosamples_accessions:
+            assert biosamples_accession.startswith(BIOSAMPLES_PREFIX)

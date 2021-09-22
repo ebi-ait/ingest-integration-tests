@@ -56,6 +56,12 @@ class TestIngest(unittest.TestCase):
         self.runner.archived_run(dataset_fixture)
         return self.runner
 
+    def ingest_to_direct_archives(self, dataset_name: str):
+        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
+        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api, self.ingest_archiver, self.ingest_client_api)
+        self.runner.direct_archived_run(dataset_fixture)
+        return self.runner
+
     def ingest_to_terra(self, dataset_name):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         self.runner = DatasetRunner(self.ingest_broker, self.ingest_api)
@@ -81,18 +87,21 @@ class TestIngest(unittest.TestCase):
 class TestRun(TestIngest):
 
     def test_ss2_ingest_to_upload(self):
-        runner = self.ingest_and_upload_only('SS2')
+        self.ingest_and_upload_only('SS2')
 
     def test_big_submission_run(self):
         self.ingest_big_submission()
 
     # cannot be run in prod, need to know how to delete the submitted data to archives
     def test_ingest_to_archives(self):
-        runner = self.ingest_to_archives('SS2')
+        self.ingest_to_archives('SS2')
+
+    def test_direct_archiving(self):
+        self.ingest_to_direct_archives('SS2')
 
     # cannot be run in prod, need to know how to delete the submitted data to terra
     def test_ingest_to_terra(self):
-        runner = self.ingest_to_terra('SS2')
+        self.ingest_to_terra('SS2')
 
     def test_bulk_update(self):
         self.bulk_update('SS2')
