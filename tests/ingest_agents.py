@@ -242,14 +242,9 @@ class IngestArchiverAgent:
             'Api-Key': self.api_key
         }
 
-    def archive_submission(self, ingest_submission_uuid: str):
-        data = {
-            'submission_uuid': ingest_submission_uuid,
-            'alias_prefix': 'INGEST_INTEGRATION_TEST',
-            'exclude_types': 'sequencingRun'
-        }
+    def archive_submission(self, payload: dict):
         archive_submission_url = f'{self.ingest_archiver_url}/archiveSubmissions'
-        r = requests.post(archive_submission_url, json=data, headers=self.headers)
+        r = requests.post(archive_submission_url, json=payload, headers=self.headers)
         r.raise_for_status()
 
     def get_dsp_submission_uuid(self, ingest_submission_uuid):
