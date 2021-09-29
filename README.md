@@ -45,7 +45,7 @@ export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-e
 export HCA_UTIL_ADMIN_SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_SECRET_ACCESS_KEY'); \
 export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
-python3 -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
+python3 -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
 ``` 
 
 #### Gitlab Runner

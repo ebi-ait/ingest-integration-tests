@@ -6,7 +6,7 @@ stages:
 test_ingest_to_upload:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_ss2_ingest_to_upload
+     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
     - staging
@@ -58,6 +58,15 @@ test_bulk_update:
   tags:
     - ingest-integration-tests
 
+test_direct_archiving:
+  stage: test
+  script:
+     - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
+  only:
+    - dev
+    - staging
+  tags:
+    - ingest-integration-tests
 
 before_script:
   - apt-get -y update
