@@ -35,10 +35,10 @@ class DatasetRunner:
         self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
         self.submission_manager.wait_for_envelope_to_be_validated()
 
-    def direct_archived_run(self, dataset_fixture):
+    def direct_archived_run(self, dataset_fixture, deployment_env):
         self.__submit_archive_submission(dataset_fixture)
 
-        payload = self.__create_archive_submission_payload(True)
+        payload = self.__create_archive_submission_payload(True, deployment_env)
         self.ingest_archiver.archive_submission(payload)
 
         self.__check_accessions(self.submission_id)
@@ -86,11 +86,12 @@ class DatasetRunner:
             r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
             r.raise_for_status()
 
-    def __create_archive_submission_payload(self, is_direct: bool):
+    def __create_archive_submission_payload(self, is_direct: bool, deployment_env):
         payload = {
             'submission_uuid': self.submission_envelope.uuid,
             'alias_prefix': 'INGEST_INTEGRATION_TEST',
-            'exclude_types': 'sequencingRun'
+            'exclude_types': 'sequencingRun',
+            'deployment_env': deployment_env
         }
 
         if is_direct:
