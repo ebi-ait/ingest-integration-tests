@@ -86,13 +86,15 @@ class DatasetRunner:
             r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
             r.raise_for_status()
 
-    def __create_archive_submission_payload(self, is_direct: bool, deployment_env):
+    def __create_archive_submission_payload(self, is_direct: bool, deployment_env=None):
         payload = {
             'submission_uuid': self.submission_envelope.uuid,
             'alias_prefix': 'INGEST_INTEGRATION_TEST',
-            'exclude_types': 'sequencingRun',
-            'deployment_env': deployment_env
+            'exclude_types': 'sequencingRun'
         }
+
+        if deployment_env:
+            payload.update({'deployment_env': deployment_env})
 
         if is_direct:
             payload['is_direct_archiving'] = True
