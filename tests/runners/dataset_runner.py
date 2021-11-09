@@ -12,6 +12,7 @@ from tests.wait_for import WaitFor
 RELEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 BIOSAMPLES_PREFIX = 'SAME'
+BIOSTUDIES_PREFIX = 'S-BSST'
 
 
 class DatasetRunner:
@@ -102,9 +103,23 @@ class DatasetRunner:
         time.sleep(10)
         submission_envelope: IngestApiAgent.SubmissionEnvelope = self.ingest_api.envelope(envelope_id=submission_id)
         biomaterials = submission_envelope.get_biomaterials()
+        self.__verify_biosamples_accession(biomaterials)
+
+        project = submission_envelope.get_projects()[0]
+        self.__verify_project_accession(project  )
+
+    @staticmethod
+    def __verify_project_accession(project):
+        project_accessions: str = project['content']['biostudies_accessions']
+        assert len(project_accessions) == 1
+        project_accession = project_accessions[0]
+        assert project_accession.startswith(BIOSTUDIES_PREFIX)
+
+    @staticmethod
+    def __verify_biosamples_accession(biomaterials):
         biosamples_accessions = list(map(
             lambda biomaterial: biomaterial['content']['biomaterial_core']['biosamples_accession'],
-            submission_envelope.get_biomaterials()
+            biomaterials
         ))
         assert len(biosamples_accessions) == len(biomaterials)
         biosamples_accession: str
