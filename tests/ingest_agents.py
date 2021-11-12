@@ -117,6 +117,10 @@ class IngestApiAgent:
             return self.data['submissionState']
 
         def __set_valid_graph(self):
+            graph_requested_url = self.url + '/graphRequestedEvent'
+            r = requests.put(graph_requested_url, headers=self.auth_headers)
+            r.raise_for_status()
+
             graph_validating_url = self.url + '/graphValidatingEvent'
             r = requests.put(graph_validating_url, headers=self.auth_headers)
             r.raise_for_status()
