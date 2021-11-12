@@ -59,7 +59,7 @@ class TestIngest(unittest.TestCase):
     def ingest_to_direct_archives(self, dataset_name: str):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         self.runner = DatasetRunner(self.ingest_broker, self.ingest_api, self.ingest_archiver, self.ingest_client_api)
-        self.runner.direct_archived_run(dataset_fixture, self.deployment)
+        self.runner.direct_archived_run(dataset_fixture)
         return self.runner
 
     def ingest_to_terra(self, dataset_name):
