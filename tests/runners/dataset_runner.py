@@ -12,6 +12,7 @@ from tests.wait_for import WaitFor
 RELEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 BIOSAMPLES_PREFIX = 'SAME'
+BIOSTUDIES_PREFIX = 'S-BSST'
 
 
 class DatasetRunner:
@@ -35,10 +36,10 @@ class DatasetRunner:
         self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
         self.submission_manager.wait_for_envelope_to_be_validated()
 
-    def direct_archived_run(self, dataset_fixture, deployment_env):
+    def direct_archived_run(self, dataset_fixture):
         self.__submit_archive_submission(dataset_fixture)
 
-        payload = self.__create_archive_submission_payload(True, deployment_env)
+        payload = self.__create_archive_submission_payload(True)
         self.ingest_archiver.archive_submission(payload)
 
         self.__check_accessions(self.submission_id)
@@ -86,15 +87,12 @@ class DatasetRunner:
             r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
             r.raise_for_status()
 
-    def __create_archive_submission_payload(self, is_direct: bool, deployment_env=None):
+    def __create_archive_submission_payload(self, is_direct: bool):
         payload = {
             'submission_uuid': self.submission_envelope.uuid,
             'alias_prefix': 'INGEST_INTEGRATION_TEST',
             'exclude_types': 'sequencingRun'
         }
-
-        if deployment_env:
-            payload.update({'deployment_env': deployment_env})
 
         if is_direct:
             payload['is_direct_archiving'] = True
@@ -105,9 +103,23 @@ class DatasetRunner:
         time.sleep(10)
         submission_envelope: IngestApiAgent.SubmissionEnvelope = self.ingest_api.envelope(envelope_id=submission_id)
         biomaterials = submission_envelope.get_biomaterials()
+        self.__verify_biosamples_accession(biomaterials)
+
+        project = submission_envelope.get_projects()[0]
+        self.__verify_project_accession(project  )
+
+    @staticmethod
+    def __verify_project_accession(project):
+        project_accessions: str = project['content']['biostudies_accessions']
+        assert len(project_accessions) == 1
+        project_accession = project_accessions[0]
+        assert project_accession.startswith(BIOSTUDIES_PREFIX)
+
+    @staticmethod
+    def __verify_biosamples_accession(biomaterials):
         biosamples_accessions = list(map(
             lambda biomaterial: biomaterial['content']['biomaterial_core']['biosamples_accession'],
-            submission_envelope.get_biomaterials()
+            biomaterials
         ))
         assert len(biosamples_accessions) == len(biomaterials)
         biosamples_accession: str
