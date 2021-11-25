@@ -80,8 +80,8 @@ class UpdateSubmissionRunner:
 
         submission_manager = SubmissionManager(update_submission)
         submission_manager.wait_for_envelope_to_be_validated()
-        submission_manager.graph_validate_envelope()
-        submission_manager.wait_for_envelope_to_be_graph_valid()
+        submission_manager.validate_envelope_graph()
+        submission_manager.wait_for_envelope_to_have_valid_graph()
         submission_manager.submit_envelope()
         submission_manager.wait_for_envelope_to_be_submitted()
         submission_manager.wait_for_envelope_to_complete()
@@ -105,8 +105,8 @@ class UpdateSubmissionRunner:
         # Disable indexing since this is an internal test for ingest, we don't need to trigger analysis pipelines
         submission_manager.submission_envelope.disable_indexing()
 
-        submission_manager.graph_validate_envelope()
-        submission_manager.wait_for_envelope_to_be_graph_valid()
+        submission_manager.validate_envelope_graph()
+        submission_manager.wait_for_envelope_to_have_valid_graph()
 
         submission_manager.submit_envelope()
         submission_manager.wait_for_envelope_to_complete()
