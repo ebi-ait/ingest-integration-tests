@@ -35,6 +35,8 @@ class DatasetRunner:
         self.submission_manager.get_upload_area_credentials()
         self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
         self.submission_manager.wait_for_envelope_to_be_validated()
+        self.submission_manager.validate_envelope_graph()
+        self.submission_manager.wait_for_envelope_to_have_valid_graph()
 
     def direct_archived_run(self, dataset_fixture):
         self.__submit_archive_submission(dataset_fixture)
@@ -64,9 +66,6 @@ class DatasetRunner:
 
     def complete_run(self, dataset_fixture, project_uuid=None):
         self.valid_run(dataset_fixture, project_uuid)
-        
-        self.submission_manager.validate_envelope_graph()
-        self.submission_manager.wait_for_envelope_to_have_valid_graph()
 
         self.submission_manager.submit_envelope(["Export", "Cleanup"])
         self.submission_manager.wait_for_envelope_to_complete()
@@ -81,9 +80,6 @@ class DatasetRunner:
 
     def __submit_archive_submission(self, dataset_fixture):
         self.valid_run(dataset_fixture)
-        
-        self.submission_manager.validate_envelope_graph()
-        self.submission_manager.wait_for_envelope_to_have_valid_graph()
 
         self.submission_manager.submit_envelope(["Archive"])
         self.submission_manager.wait_for_envelope_to_be_archiving()
