@@ -116,26 +116,15 @@ class IngestApiAgent:
         def status(self):
             return self.data['submissionState']
 
-        def __set_valid_graph(self):
-            graph_requested_url = self.url + '/graphRequestedEvent'
-            r = requests.put(graph_requested_url, headers=self.auth_headers)
-            r.raise_for_status()
+        def graphValidationState(self):
+            return self.data['graphValidationState']
 
-            graph_validating_url = self.url + '/graphValidatingEvent'
-            r = requests.put(graph_validating_url, headers=self.auth_headers)
+        def triggerGraphValidation(self):
+            r = requests.post(self.url + '/validateGraph', headers=self.auth_headers)
             r.raise_for_status()
-
-            graph_valid_url = self.url + '/graphValidEvent'
-            r = requests.put(graph_valid_url, headers=self.auth_headers)
-            r.raise_for_status()
+            return r
 
         def submit(self, submit_actions=None):
-            # Workaround to allow submission to continue.
-            # Submissions need to have `graphValidationState === 'Valid'` before submitting
-            # Really this should be done automatically and we should have a `wait_for_envelope_to_be_graph_valid` method in SubmissionManager
-            # This is a temporary fix until we do the above in dcp-506
-            self.__set_valid_graph()
-
             if not submit_actions:
                 submit_actions = []
 

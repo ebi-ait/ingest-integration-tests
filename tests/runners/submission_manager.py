@@ -43,6 +43,9 @@ class SubmissionManager:
         self._run_command(f'hca-util select {upload_area_uuid} --profile {HCA_UTIL_ADMIN_PROFILE}')
         self._run_command(f'hca-util sync {self.upload_credentials} --profile {HCA_UTIL_ADMIN_PROFILE}')
 
+    def validate_envelope_graph(self):
+        self.submission_envelope.triggerGraphValidation()
+    
     def submit_envelope(self, submit_actions=None):
         self.submission_envelope.submit(submit_actions)
 
@@ -51,6 +54,11 @@ class SubmissionManager:
         WaitFor(self._envelope_is_in_state, 'Valid').to_return_value(
             value=True)
         Progress.report(" envelope is valid.\n")
+
+    def wait_for_envelope_to_have_valid_graph(self):
+        Progress.report("WAIT FOR GRAPH VALIDATION...")
+        WaitFor(self._envelope_has_graph_validation_state, 'Valid').to_return_value(value=True)
+        Progress.report(" envelope graph validation state is valid.\n")
 
     def wait_for_envelope_to_be_submitted(self):
         Progress.report("WAIT FOR SUBMITTED...")
@@ -98,6 +106,11 @@ class SubmissionManager:
         envelope_status = self.submission_envelope.reload().status()
         Progress.report(f"envelope status is {envelope_status}")
         return envelope_status in [state]
+
+    def _envelope_has_graph_validation_state(self, state):
+        graph_validation_state = self.submission_envelope.reload().graphValidationState()
+        Progress.report(f"Envelope graph validation state is {graph_validation_state}")
+        return graph_validation_state == state
 
     def ensure_submitted(self):
         try:
