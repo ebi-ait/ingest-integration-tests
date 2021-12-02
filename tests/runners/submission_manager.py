@@ -23,6 +23,16 @@ class SubmissionManager:
         self.submission_envelope = submission_envelope
         self.upload_credentials = None
 
+    def spreadsheet_imported(self):
+        manifest = self.submission_envelope.get_submission_manifest()
+        summary = self.submission_envelope.get_submission_summary()
+        return manifest and summary and \
+               manifest.get('expectedBiomaterials', 0) == summary.get('totalBiomaterials', 0) and \
+               manifest.get('expectedFiles', 0) == summary.get('totalFiles', 0) and \
+               manifest.get('expectedProtocols', 0) == summary.get('totalProtocols', 0) and \
+               manifest.get('expectedProcesses', 0) == summary.get('totalProcesses', 0) and \
+               manifest.get('actualLinks', 0) == manifest.get('expectedLinks', 0)
+
     def get_upload_area_credentials(self):
         Progress.report("WAITING FOR STAGING AREA...")
         self.upload_credentials = WaitFor(
@@ -39,15 +49,23 @@ class SubmissionManager:
 
     def _stage_data_files_using_s3_sync(self, upload_area_uuid):
         Progress.report("STAGING FILES using hca-util cli...")
-        self._run_command(f'hca-util config {HCA_UTIL_ADMIN_ACCESS} {HCA_UTIL_ADMIN_SECRET} --profile {HCA_UTIL_ADMIN_PROFILE}', verbose=False)
+        self._run_command(
+            f'hca-util config {HCA_UTIL_ADMIN_ACCESS} {HCA_UTIL_ADMIN_SECRET} --profile {HCA_UTIL_ADMIN_PROFILE}',
+            verbose=False)
         self._run_command(f'hca-util select {upload_area_uuid} --profile {HCA_UTIL_ADMIN_PROFILE}')
         self._run_command(f'hca-util sync {self.upload_credentials} --profile {HCA_UTIL_ADMIN_PROFILE}')
 
     def validate_envelope_graph(self):
         self.submission_envelope.triggerGraphValidation()
-    
+
     def submit_envelope(self, submit_actions=None):
         self.submission_envelope.submit(submit_actions)
+
+    def wait_for_envelope_to_be_imported(self):
+        Progress.report("WAIT FOR IMPORTING...")
+        WaitFor(self.spreadsheet_imported).to_return_value(
+            value=True)
+        Progress.report(" envelope is imported.\n")
 
     def wait_for_envelope_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")
@@ -127,9 +145,7 @@ class SubmissionManager:
                 raise
 
     @staticmethod
-    def _run_command(cmd:str, expected_retcode=0, verbose=True):
+    def _run_command(cmd: str, expected_retcode=0, verbose=True):
         retcode, output, error = run_command(cmd, verbose=verbose)
         if retcode != 0:
             raise Exception(f"Unexpected return code from '{cmd}', expected {expected_retcode} got {retcode}")
-
-

@@ -45,9 +45,7 @@ class BulkUpdateRunner:
         self.dataset = dataset_fixture
         self.__upload_spreadsheet_and_create_submission(dataset_fixture, project_uuid)
         self.submission_manager = SubmissionManager(self.submission_envelope)
-        self.submission_manager.get_upload_area_credentials()
-        self.submission_manager.stage_data_files(self.dataset.config['data_files_upload_area_uuid'])
-        self.submission_manager.wait_for_envelope_to_be_validated()
+        self.submission_manager.wait_for_envelope_to_be_imported()
 
     def __upload_spreadsheet_and_create_submission(self, dataset_fixture, project_uuid=None):
         spreadsheet_filename = os.path.basename(dataset_fixture.metadata_spreadsheet_path)
@@ -59,7 +57,7 @@ class BulkUpdateRunner:
 
     def __upload_modified_spreadsheet(self, path_to_spreadsheet):
         self.ingest_broker.upload(path_to_spreadsheet, is_update=True)
-        self.submission_manager.wait_for_envelope_to_be_validated()
+        # There is no way to know if spreadsheet update has finished
 
     def __get_original_content(self):
         project_payload = self.__get_project_content()
