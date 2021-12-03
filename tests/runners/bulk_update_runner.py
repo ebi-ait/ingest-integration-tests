@@ -6,13 +6,55 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
-from tests.runners.bulk_update_manager import BulkUpdateManager
+from tests.runners.bulk_update_manager import BulkUpdateManager, VALUE_ROW_NUMBER, HEADER_ROW_NUMBER
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 
 MODIFIED_INSDC_ACCESSION_ID = '999'
 
 UI_CHANGE_VALUE = 'UI CHANGE '
+
+
+def _get_metadata_info():
+    metadata_info = {
+        'donor_organism': {
+            'sheet_name': 'Donor organism',
+            'linked_to': []
+        },
+        'specimen_from_organism': {
+            'sheet_name': 'Specimen from organism',
+            'linked_to': ['donor_organism', 'collection_protocol']
+        },
+        'cell_suspension': {
+            'sheet_name': 'Cell suspension',
+            'linked_to': ['specimen_from_organism', 'dissociation_protocol', 'enrichment_protocol']
+        },
+        'sequence_file': {
+            'sheet_name': 'Sequence file',
+            'linked_to': ['cell_suspension', 'library_preparation_protocol', 'sequencing_protocol']
+        },
+        'collection_protocol': {
+            'sheet_name': 'Collection protocol',
+            'linked_to': []
+        },
+        'dissociation_protocol': {
+            'sheet_name': 'Dissociation protocol',
+            'linked_to': []
+        },
+        'enrichment_protocol': {
+            'sheet_name': 'Enrichment protocol',
+            'linked_to': []
+        },
+        'library_preparation_protocol': {
+            'sheet_name': 'Library preparation protocol',
+            'linked_to': []
+        },
+        'sequencing_protocol': {
+            'sheet_name': 'Sequencing protocol',
+            'linked_to': []
+        }
+    }
+    return metadata_info
 
 
 class BulkUpdateRunner:
@@ -33,10 +75,12 @@ class BulkUpdateRunner:
         self.__get_original_content()
         updated_project_description, updated_contributor_name, updated_insdc_accession = \
             self.__modify_metadata_with_api_calls()
-        update_spreadsheet, updated_spreadsheet_path = self.__download_modified_spreadsheet()
+
+        workbook, updated_spreadsheet_path = self.__download_modified_spreadsheet()
+        self.__verify_spreadsheet_links(workbook)
         updated_project_title, updated_biomaterial_name, modified_biomaterial_id = \
-            self.__modify_metadata_in_sheet(update_spreadsheet)
-        self.bulk_update_manager.save_modified_spreadsheet(update_spreadsheet, updated_spreadsheet_path)
+            self.__modify_metadata_in_sheet(workbook)
+        self.bulk_update_manager.save_modified_spreadsheet(workbook, updated_spreadsheet_path)
         self.__upload_modified_spreadsheet(updated_spreadsheet_path)
         self.__validate_modifications(updated_project_description, updated_contributor_name, updated_insdc_accession,
                                       updated_project_title, updated_biomaterial_name)
@@ -134,3 +178,22 @@ class BulkUpdateRunner:
         biomaterial2_content = self.biomaterial_content_by_id.get(self.biomaterial_ids[1])
         assert updated_insdc_accession == biomaterial1_content['biomaterial_core']['insdc_sample_accession']
         assert updated_biomaterial_name == biomaterial2_content['biomaterial_core']['biomaterial_name']
+
+    def __verify_spreadsheet_links(self, workbook):
+        metadata_info = _get_metadata_info()
+
+        db = {}
+        for concrete_type in metadata_info:
+            sheet_name = metadata_info[concrete_type]['sheet_name']
+            sheet: Worksheet = workbook[sheet_name]
+            rows = list(sheet.rows)
+            headers = [cell.value for cell in rows[HEADER_ROW_NUMBER - 1]]
+            values = [cell.value for cell in rows[VALUE_ROW_NUMBER - 1]]
+            entity = dict(zip(headers, values))
+            db[concrete_type] = entity
+
+        for concrete_type in db:
+            entity = db[concrete_type]
+            links = metadata_info[concrete_type]['linked_to']
+            for link in links:
+                assert entity[f'{link}.uuid'] == db[link][f'{link}.uuid']

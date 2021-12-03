@@ -65,7 +65,7 @@ class SubmissionManager:
         Progress.report("WAIT FOR IMPORTING...")
         WaitFor(self.spreadsheet_imported).to_return_value(
             value=True)
-        Progress.report(" envelope is imported.\n")
+        Progress.report("spreadsheet is imported.\n")
 
     def wait_for_envelope_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")
