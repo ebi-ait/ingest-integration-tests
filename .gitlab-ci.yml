@@ -51,7 +51,6 @@ test_bulk_update:
   script:
      - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   only:
-    - dcp-552-int-test-download-links
     - dev
     - staging
     - prod
