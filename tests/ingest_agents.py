@@ -168,6 +168,12 @@ class IngestApiAgent:
         def get_bundle_manifests(self):
             return self._get_entity_list('bundleManifests')
 
+        def get_submission_manifest(self):
+            return self._get_entity('submissionManifest')
+
+        def get_submission_summary(self):
+            return self._get_entity('summary')
+
         def delete(self):
             projects = self.get_projects()
             project = projects[0] if len(projects) > 0 else None
@@ -189,6 +195,20 @@ class IngestApiAgent:
             result = files['_embedded'][entity_type] if files.get('_embedded') and files['_embedded'].get(
                 entity_type) else []
             return result
+
+        def _get_entity(self, entity_type):
+            url = self.data['_links'][entity_type]['href']
+            headers = {
+                'Content-type': 'application/json',
+                'Accept': 'application/json'
+            }
+            self.auth_headers.update(headers)
+            r = requests.get(url, headers=self.auth_headers)
+
+            entity = None
+            if r.status_code == requests.codes.ok:
+                entity = r.json()
+            return entity
 
         @property
         def uuid(self):
