@@ -120,7 +120,7 @@ class IngestApiAgent:
             return self.data['graphValidationState']
 
         def triggerGraphValidation(self):
-            r = requests.post(self.url + '/validateGraph', headers=self.auth_headers)
+            r = requests.put(self.url + '/graphValidationRequestedEvent', headers=self.auth_headers)
             r.raise_for_status()
             return r
 
