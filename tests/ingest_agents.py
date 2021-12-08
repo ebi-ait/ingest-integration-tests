@@ -21,7 +21,7 @@ class IngestBrokerAgent:
         self.ingest_auth_agent = IngestAuthAgent()
         self.auth_headers = self.ingest_auth_agent.make_auth_header()
 
-    def upload(self, metadata_spreadsheet_path, is_update=False, project_uuid=None):
+    def upload(self, metadata_spreadsheet_path, is_update=False, project_uuid=None, submission_uuid=None):
         url = self.ingest_broker_url + '/api_upload'
         if is_update:
             url = self.ingest_broker_url + '/api_upload_update'
@@ -29,6 +29,10 @@ class IngestBrokerAgent:
         data = {}
         if project_uuid:
             data['projectUuid'] = project_uuid
+
+        if submission_uuid:
+            data['submissionUuid'] = submission_uuid
+
         files = {'file': open(metadata_spreadsheet_path, 'rb')}
 
         response = requests.post(url, data=data, files=files, allow_redirects=False, headers=self.auth_headers)
