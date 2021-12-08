@@ -69,6 +69,7 @@ class BulkUpdateRunner:
         self.dataset = None
         self.submission_manager: SubmissionManager = None
         self.bulk_update_manager = bulk_update_manager
+        self.project_uuid = None
 
     def bulk_update_run(self, dataset_fixture):
         self.__import_spreadsheet_with_files(dataset_fixture)
@@ -100,12 +101,16 @@ class BulkUpdateRunner:
         self.submission_envelope = self.ingest_api.envelope(self.submission_id)
 
     def __upload_modified_spreadsheet(self, path_to_spreadsheet):
-        self.ingest_broker.upload(path_to_spreadsheet, is_update=True)
+        submission_uuid = self.submission_envelope.uuid
+        project_uuid = self.project_uuid
+        self.ingest_broker.upload(path_to_spreadsheet, is_update=True, project_uuid=project_uuid,
+                                  submission_uuid=submission_uuid)
         # There is no way to know if spreadsheet update has finished
 
     def __get_original_content(self):
         project_payload = self.__get_project_content()
         self.project_id = self.bulk_update_manager.get_id_from_entity(project_payload)
+        self.project_uuid = project_payload['uuid']['uuid']
 
         self.__get_biomaterial_content_by_id()
         self.biomaterial_ids = [*self.biomaterial_content_by_id]
