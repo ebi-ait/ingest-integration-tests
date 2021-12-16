@@ -79,7 +79,7 @@ class UpdateSubmissionRunner:
         update_submission = self.ingest_api.envelope(envelope_id=update_submission_id)
 
         submission_manager = SubmissionManager(update_submission)
-        submission_manager.wait_for_envelope_to_be_validated()
+        submission_manager.wait_for_envelope_metadata_to_be_validated()
         submission_manager.validate_envelope_graph()
         submission_manager.wait_for_envelope_to_have_valid_graph()
         submission_manager.submit_envelope()
@@ -100,7 +100,7 @@ class UpdateSubmissionRunner:
         submission_manager = SubmissionManager(primary_submission)
         submission_manager.get_upload_area_credentials()
         submission_manager.stage_data_files(dataset_fixture.config['data_files_location'])
-        submission_manager.wait_for_envelope_to_be_validated()
+        submission_manager.wait_for_envelope_metadata_to_be_validated()
 
         # Disable indexing since this is an internal test for ingest, we don't need to trigger analysis pipelines
         submission_manager.submission_envelope.disable_indexing()

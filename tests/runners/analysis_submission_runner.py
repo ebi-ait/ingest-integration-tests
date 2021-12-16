@@ -45,7 +45,7 @@ class AnalysisSubmissionRunner:
         self.bundle_manifest_uuid = self.mock_export()
         self.analysis_fixture = analysis_fixture
         self.create_analysis_submission()
-        self.submission_manager.wait_for_envelope_to_be_validated()
+        self.submission_manager.wait_for_envelope_metadata_to_be_validated()
 
     def _get_headers(self):
         headers = {'Content-type': 'application/json',
