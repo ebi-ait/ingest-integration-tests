@@ -10,8 +10,9 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 ADD ./requirements.txt ./
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
 ADD ./tests ./tests
 
 RUN aws --version
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
