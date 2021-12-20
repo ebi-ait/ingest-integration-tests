@@ -1,9 +1,30 @@
-image: python:3.6
+variables:
+  IMAGE_NAME: "quay.io/ebi-ait/ingest-base-images:ingest-integration-tests"
 
 stages:
+  - build
   - test
 
+build:
+  stage: build
+  only:
+    refs:
+      - dev
+    changes:
+      - Dockerfile
+      - requirements.txt
+      - src/**/*
+  tags:
+    - dind
+  before_script:
+    - echo "Building image..."
+  script:
+    - echo $QUAY_PASSWORD | docker login quay.io -u $QUAY_USERNAME --password-stdin
+    - docker build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+    
 test_ingest_to_upload:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
@@ -15,6 +36,7 @@ test_ingest_to_upload:
 
 
 test_ingest_to_archives:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
@@ -26,6 +48,7 @@ test_ingest_to_archives:
 
 
 test_ingest_to_terra:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
@@ -37,6 +60,7 @@ test_ingest_to_terra:
 
 
 test_big_submission:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
@@ -47,6 +71,7 @@ test_big_submission:
     - ingest-integration-tests
 
 test_bulk_update:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_bulk_update
@@ -58,6 +83,7 @@ test_bulk_update:
     - ingest-integration-tests
 
 test_direct_archiving:
+  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
@@ -68,10 +94,6 @@ test_direct_archiving:
     - ingest-integration-tests
 
 before_script:
-  - apt-get -y update
-  - apt-get -y install jq
-  - apt-get -y install awscli
-  - pip install -r requirements.txt
   - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
   - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
   - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
