@@ -5,7 +5,24 @@ stages:
   - build
   - test
 
+default:
+  before_script:
+    - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
+    - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
+    - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
+    - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
+    - export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_ACCESS_KEY')
+    - export HCA_UTIL_ADMIN_SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_SECRET_ACCESS_KEY')
+    - export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'
+    - aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
+    - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
+  image: $IMAGE_NAME
+  tags:
+    - ingest-integration-tests
+
 build:
+  inherit:
+    default: false
   stage: build
   only:
     refs:
@@ -16,62 +33,47 @@ build:
       - src/**/*
   tags:
     - dind
-  before_script:
-    - echo "Building image..."
   script:
     - echo $QUAY_PASSWORD | docker login quay.io -u $QUAY_USERNAME --password-stdin
     - docker build -t $IMAGE_NAME .
     - docker push $IMAGE_NAME
     
 test_ingest_to_upload:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
     - staging
-  tags:
-    - ingest-integration-tests
 
 
 test_ingest_to_archives:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
   only:
     - dev
     - staging
-  tags:
-    - ingest-integration-tests
 
 
 test_ingest_to_terra:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
     - dev
     - staging
-  tags:
-    - ingest-integration-tests
 
 
 test_big_submission:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
     - staging
-  tags:
-    - ingest-integration-tests
 
 test_bulk_update:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_bulk_update
@@ -79,27 +81,11 @@ test_bulk_update:
     - dev
     - staging
     - prod
-  tags:
-    - ingest-integration-tests
 
 test_direct_archiving:
-  image: $IMAGE_NAME
   stage: test
   script:
      - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
   only:
     - dev
     - staging
-  tags:
-    - ingest-integration-tests
-
-before_script:
-  - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
-  - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
-  - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
-  - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
-  - export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_ACCESS_KEY')
-  - export HCA_UTIL_ADMIN_SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_SECRET_ACCESS_KEY')
-  - export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'
-  - aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
-  - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
