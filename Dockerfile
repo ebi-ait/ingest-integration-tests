@@ -14,5 +14,3 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 ADD ./tests ./tests
-
-RUN aws --version
