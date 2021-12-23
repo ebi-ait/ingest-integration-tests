@@ -23,6 +23,9 @@ default:
 build:
   inherit:
     default: false
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
   stage: build
   only:
     refs:
