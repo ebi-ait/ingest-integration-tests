@@ -1,11 +1,10 @@
 FROM ubuntu:latest
 
-RUN apt-get update
-RUN apt-get install -y python3-dev python3 python3-pip curl unzip git jq
+# Stop any questions when installing packages
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \ 
-    unzip awscliv2.zip && \
-    ./aws/install
+RUN apt-get update
+RUN apt-get install -y python3-dev python3 python3-pip git jq awscli
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
