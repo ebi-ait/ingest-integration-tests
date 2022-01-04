@@ -23,15 +23,20 @@ class IngestBrokerAgent:
 
     def upload(self, metadata_spreadsheet_path, is_update=False, project_uuid=None, submission_uuid=None):
         url = self.ingest_broker_url + '/api_upload'
-        if is_update:
-            url = self.ingest_broker_url + '/api_upload_update'
 
-        data = {}
+        params = {}
+        if is_update:
+            params['isUpdate'] = is_update
+
         if project_uuid:
-            data['projectUuid'] = project_uuid
+            params['projectUuid'] = project_uuid
 
         if submission_uuid:
-            data['submissionUuid'] = submission_uuid
+            params['submissionUuid'] = submission_uuid
+
+        data = {
+            'params': json.dumps(params)
+        }
 
         files = {'file': open(metadata_spreadsheet_path, 'rb')}
 
