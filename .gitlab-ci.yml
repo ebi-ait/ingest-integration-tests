@@ -37,6 +37,7 @@ build:
   only:
     refs:
       - dev
+      - staging
     changes:
       - Dockerfile
       - requirements.txt
