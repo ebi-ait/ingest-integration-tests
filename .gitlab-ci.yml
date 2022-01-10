@@ -33,12 +33,18 @@ build:
     DOCKER_TLS_VERIFY: 1
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   stage: build
-  only:
-    changes:
-      - Dockerfile
-      - requirements.txt
-      - src/**/*
-      - .gitlab-ci.yml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      - changes:
+          - Dockerfile
+          - requirements.txt
+          - src/**/*
+          - .gitlab-ci.yml
+      - when: always
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
   tags:
     - dind
   script:
