@@ -1,5 +1,5 @@
 variables:
-  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHORT_SHA
+  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}
 stages:
   - build
   - test
@@ -34,10 +34,11 @@ build:
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   stage: build
   only:
-    refs:
-      - dev
-      - staging
-      - prod
+    changes:
+      - Dockerfile
+      - requirements.txt
+      - src/**/*
+      - .gitlab-ci.yml
   tags:
     - dind
   script:
