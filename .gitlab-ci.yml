@@ -55,6 +55,7 @@ test_ingest_to_upload:
   only:
     - dev
     - staging
+    - prod
 
 
 test_ingest_to_archives:
