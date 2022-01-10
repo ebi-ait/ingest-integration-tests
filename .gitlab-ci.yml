@@ -1,5 +1,5 @@
 variables:
-  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:$CI_COMMIT_SHORT_SHA
+  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHORT_SHA
 stages:
   - build
   - test
@@ -36,10 +36,8 @@ build:
   only:
     refs:
       - dev
-    changes:
-      - Dockerfile
-      - requirements.txt
-      - src/**/*
+      - staging
+      - prod
   tags:
     - dind
   script:
