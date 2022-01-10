@@ -7,7 +7,7 @@ stages:
 
 default:
   before_script:
-    - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
+    - export INGEST_API_JWT_AUDIENCE=https://data.humancellatlas.org/
     - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
     - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
     - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
