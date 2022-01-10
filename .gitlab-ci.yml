@@ -1,6 +1,5 @@
 variables:
-  IMAGE_NAME: "quay.io/ebi-ait/ingest-base-images:ingest-integration-tests"
-
+  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}
 stages:
   - build
   - test
@@ -16,7 +15,7 @@ default:
     - export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'
     - aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/gcp-credentials.json | jq -r .SecretString > gcp-credentials.json
     - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
-  image: $IMAGE_NAME
+  image: $INTEGRATION_TEST_IMAGE_NAME
   tags:
     - ingest-integration-tests
 
@@ -35,19 +34,17 @@ build:
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   stage: build
   only:
-    refs:
-      - dev
-      - staging
     changes:
       - Dockerfile
       - requirements.txt
       - src/**/*
+      - .gitlab-ci.yml
   tags:
     - dind
   script:
     - echo $QUAY_PASSWORD | docker login quay.io -u $QUAY_USERNAME --password-stdin
-    - docker build -t $IMAGE_NAME .
-    - docker push $IMAGE_NAME
+    - docker build -t $INTEGRATION_TEST_IMAGE_NAME .
+    - docker push $INTEGRATION_TEST_IMAGE_NAME
     
 test_ingest_to_upload:
   stage: test
