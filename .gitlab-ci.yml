@@ -33,23 +33,29 @@ build:
     DOCKER_TLS_VERIFY: 1
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   stage: build
-  only:
-    changes:
-      - Dockerfile
-      - requirements.txt
-      - src/**/*
-      - .gitlab-ci.yml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - Dockerfile
+        - requirements.txt
+        - src/**/*
+        - .gitlab-ci.yml
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
   tags:
     - dind
   script:
     - echo $QUAY_PASSWORD | docker login quay.io -u $QUAY_USERNAME --password-stdin
     - docker build -t $INTEGRATION_TEST_IMAGE_NAME .
     - docker push $INTEGRATION_TEST_IMAGE_NAME
-    
+
 test_ingest_to_upload:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
+    - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
     - staging
@@ -58,7 +64,7 @@ test_ingest_to_upload:
 test_ingest_to_archives:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
+    - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
   only:
     - dev
     - staging
@@ -67,7 +73,7 @@ test_ingest_to_archives:
 test_ingest_to_terra:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
+    - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
     - dev
     - staging
@@ -76,7 +82,7 @@ test_ingest_to_terra:
 test_big_submission:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
+    - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
     - staging
@@ -84,7 +90,7 @@ test_big_submission:
 test_bulk_update:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
+    - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   only:
     - dev
     - staging
@@ -93,7 +99,7 @@ test_bulk_update:
 test_direct_archiving:
   stage: test
   script:
-     - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
+    - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
   only:
     - dev
     - staging
