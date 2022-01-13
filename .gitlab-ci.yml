@@ -42,9 +42,9 @@ build:
         - .gitlab-ci.yml
       when: always
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
-      when: never
+      when: manual
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
+      when: manual
   tags:
     - dind
   script:
