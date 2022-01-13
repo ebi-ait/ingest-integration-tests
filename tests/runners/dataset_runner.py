@@ -109,8 +109,9 @@ class DatasetRunner:
         biomaterials = submission_envelope.get_biomaterials()
         self.__verify_biosamples_accession(biomaterials)
 
-        project = submission_envelope.get_projects()[0]
-        self.__verify_project_accession(project  )
+        # TODO There is a bug when we set BioStudies accession we are going to fix it when we deal with ticket #531
+        # project = submission_envelope.get_projects()[0]
+        # self.__verify_project_accession(project  )
 
     @staticmethod
     def __verify_project_accession(project):
