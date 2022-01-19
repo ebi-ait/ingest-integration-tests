@@ -38,7 +38,7 @@ build:
       changes:
         - Dockerfile
         - requirements.txt
-        - src/**/*
+        - tests/**/*
         - .gitlab-ci.yml
       when: always
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
