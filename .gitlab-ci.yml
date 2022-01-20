@@ -1,5 +1,5 @@
 variables:
-  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}
+  INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}
 stages:
   - build
   - test
@@ -34,7 +34,7 @@ build:
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   stage: build
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "prod")'
       changes:
         - Dockerfile
         - requirements.txt
