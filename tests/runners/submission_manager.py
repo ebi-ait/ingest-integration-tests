@@ -33,6 +33,10 @@ class SubmissionManager:
                manifest.get('expectedProcesses', 0) == summary.get('totalProcesses', 0) and \
                manifest.get('actualLinks', 0) == manifest.get('expectedLinks', 0)
 
+    def spreadsheet_generated(self):
+        job = self.submission_envelope.reload().last_spreadsheet_generation_job().get('finishedDate')
+        return bool(job)
+
     def get_upload_area_credentials(self):
         Progress.report("WAITING FOR STAGING AREA...")
         self.upload_credentials = WaitFor(
@@ -56,7 +60,7 @@ class SubmissionManager:
         self._run_command(f'hca-util sync {self.upload_credentials} --profile {HCA_UTIL_ADMIN_PROFILE}')
 
     def validate_envelope_graph(self):
-        self.submission_envelope.triggerGraphValidation()
+        self.submission_envelope.trigger_graph_validation()
 
     def submit_envelope(self, submit_actions=None):
         self.submission_envelope.submit(submit_actions)
@@ -66,6 +70,12 @@ class SubmissionManager:
         WaitFor(self.spreadsheet_imported).to_return_value(
             value=True)
         Progress.report("spreadsheet is imported.\n")
+
+    def wait_for_spreadsheet_to_be_generated(self):
+        Progress.report("WAIT FOR SPREADSHEET GENERATION...")
+        WaitFor(self.spreadsheet_generated).to_return_value(
+            value=True)
+        Progress.report("spreadsheet is generated.\n")
 
     def wait_for_envelope_metadata_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")

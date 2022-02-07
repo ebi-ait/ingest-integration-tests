@@ -45,10 +45,16 @@ class IngestBrokerAgent:
             raise RuntimeError(f"POST {url} response was {response.status_code}: {response.content}")
         return json.loads(response.content)['details']['submission_id']
 
-    def download(self, submission_uuid):
+    def download_spreadsheet(self, submission_uuid):
         url = self.ingest_broker_url + f'/submissions/{submission_uuid}/spreadsheet'
         response = requests.get(url)
         return response.content
+
+    def generate_spreadsheet(self, submission_uuid):
+        url = self.ingest_broker_url + f'/submissions/{submission_uuid}/spreadsheet'
+        response = requests.post(url)
+        response.raise_for_status()
+        return response
 
 
 class IngestApiAgent:
@@ -125,10 +131,13 @@ class IngestApiAgent:
         def status(self):
             return self.data['submissionState']
 
-        def graphValidationState(self):
+        def last_spreadsheet_generation_job(self):
+            return self.data['lastSpreadsheetGenerationJob'] or {}
+
+        def graph_validation_state(self):
             return self.data['graphValidationState']
 
-        def triggerGraphValidation(self):
+        def trigger_graph_validation(self):
             r = requests.put(self.url + '/graphValidationRequestedEvent', headers=self.auth_headers)
             r.raise_for_status()
             return r
