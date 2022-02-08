@@ -9,6 +9,7 @@ from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
 from tests.runners.bulk_update_manager import BulkUpdateManager, VALUE_ROW_NUMBER, HEADER_ROW_NUMBER
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
+from tests.wait_for import WaitFor
 
 MODIFIED_INSDC_ACCESSION_ID = '999'
 
@@ -151,7 +152,9 @@ class BulkUpdateRunner:
 
     def __download_modified_spreadsheet(self):
         submission_uuid = self.submission_envelope.uuid
-        update_spreadsheet_content = self.ingest_broker.download(submission_uuid)
+        self.ingest_broker.generate_spreadsheet(submission_uuid)
+        self.submission_manager.wait_for_spreadsheet_to_be_generated()
+        update_spreadsheet_content = self.ingest_broker.download_spreadsheet(submission_uuid)
         update_spreadsheet_filename = f'{submission_uuid}.xlsx'
         update_spreadsheet_path = os.path.abspath(os.path.join(os.path.dirname(__file__), update_spreadsheet_filename))
         with open(update_spreadsheet_path, 'wb') as f:
