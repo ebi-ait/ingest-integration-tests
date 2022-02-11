@@ -87,6 +87,7 @@ class TestIngest(unittest.TestCase):
 class TestRun(TestIngest):
 
     DATASET_NAME = 'SS2'
+    DATASET_NAME_FOR_ARCHIVING = 'SS2_without_accessions'
 
     def test_ingest_to_upload(self):
         self.ingest_and_upload_only(TestRun.DATASET_NAME)
@@ -99,7 +100,7 @@ class TestRun(TestIngest):
         self.ingest_to_archives(TestRun.DATASET_NAME)
 
     def test_direct_archiving(self):
-        self.ingest_to_direct_archives(TestRun.DATASET_NAME)
+        self.ingest_to_direct_archives(TestRun.DATASET_NAME_FOR_ARCHIVING)
 
     # cannot be run in prod, need to know how to delete the submitted data to terra
     def test_ingest_to_terra(self):
