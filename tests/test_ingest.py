@@ -50,6 +50,7 @@ class TestIngest(unittest.TestCase):
         self.runner.valid_run(dataset_fixture)
         return self.runner
 
+    @unittest.skip("Skipping until BioStudies fixed issues")
     def ingest_to_archives(self, dataset_name: str):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         self.runner = DatasetRunner(self.ingest_broker, self.ingest_api, self.ingest_archiver, self.ingest_client_api)
