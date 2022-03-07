@@ -93,7 +93,6 @@ sequenceDiagram
   participant Exporter
   participant State as State Tracker
   participant Archiver
-  participant DSP
 
   TestRunner->>TestRunner: generates a VALID submission
   TestRunner-->>Core: triggers creation of 'assay' manifests
