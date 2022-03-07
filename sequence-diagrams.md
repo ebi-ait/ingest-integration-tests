@@ -1,10 +1,10 @@
 # Integration Tests
-- [Integration Tests](#integration_tests)
-    + [ingest_to_upload](#ingest_to_upload)
-    + [ingest_to_terra](#ingest_to_terra)
-    + [ingest_to_archives](#ingest_to_archives)
-    + [ingest_to_direct_archives](#ingest_to_direct_archives)
-    + [bulk_update](#bulk_update)
+
++ [ingest_to_upload](#ingest_to_upload)
++ [ingest_to_terra](#ingest_to_terra)
++ [ingest_to_archives](#ingest_to_archives)
++ [ingest_to_direct_archives](#ingest_to_direct_archives)
++ [bulk_update](#bulk_update)
 
 ### ingest_to_upload
 
