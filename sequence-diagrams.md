@@ -1,4 +1,10 @@
 # Integration Tests
++ [ingest_to_upload](#ingest-to-upload)
++ [ingest_to_terra](#ingest-to-terra)
++ [ingest_to_archives](#ingest-to-archives)
++ [ingest_to_direct_archives](#ingest-to-direct-archives)
++ [bulk_update](#bulk-update)
+    
 ### ingest_to_upload
 
 Tests the flow from spreadsheet upload, data file upload and data file validation and verifies that the submission state will transition to `VALID` when metadata an data files are validated.
