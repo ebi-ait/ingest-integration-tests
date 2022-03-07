@@ -4,7 +4,7 @@
 # Ingest Integration Tests
 Integration tests for ingest components.
 
-## ingest_to_upload
+### ingest_to_upload
 
 Tests the flow from spreadsheet upload, data file upload and data file validation and verifies that the submission state will transition to `VALID` when metadata an data files are validated.
 
@@ -33,7 +33,7 @@ sequenceDiagram
   TestRunner ->> Core: polls until submission is VALID, test passes!
 ```
 
-## ingest_to_terra
+### ingest_to_terra
 Tests the submission flow from Ingest to Terra. The test will generate a valid submission, verifies that the submission will be exported by checking that transition to `Exported` state.
 ```mermaid
 sequenceDiagram
@@ -53,13 +53,13 @@ sequenceDiagram
   Exporter->>Terra: submits metadata and data files to the Terra staging area
   TestRunner ->> Core: polls until submission is EXPORTED, test passes!
 ```
-## ingest_to_archives
+### ingest_to_archives
 Tests the submission flow from Ingest to the EBI public archives. The test will generate a valid submission, verifies that the submission will be archived by checking that transition to `Archived` state.
 
-## ingest_to_direct_archives
+### ingest_to_direct_archives
 Tests the submission flow from Ingest to the EBI public archives using the new implementation for the Archiver which is not using Data Submission Portal API.
 
-## bulk_update
+### bulk_update
 Tests the bulk updates flow. 
 
 
