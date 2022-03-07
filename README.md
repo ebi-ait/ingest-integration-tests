@@ -44,10 +44,10 @@ sequenceDiagram
   TestRunner->>TestRunner: generates a VALID submission
   TestRunner->>Core: triggers exporting
   Core->>Exporter: sends messages per assay
-  Exporter->>State Tracker: sends messages when a message has been started to process and when it's finished.
-  State Tracker ->> Core: sets submission state to EXPORTING
-  State Tracker ->> State Tracker: keeps track that all messages are processed
-  State Tracker ->> Core: sets submission state to EXPORTED
+  Exporter->>State: sends messages when a message has been started to process and when it's finished.
+  State ->> Core: sets submission state to EXPORTING
+  State ->> State: keeps track that all messages are processed
+  State ->> Core: sets submission state to EXPORTED
   Exporter->>Terra: submits metadata and data files to the Terra staging area
   TestRunner ->> Core: polls until submission is EXPORTED, test passes!
 ```
