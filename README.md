@@ -24,7 +24,7 @@ sequenceDiagram
   Core-->> Staging Manager: requests for upload area
   Staging Manager-->> Core: returns upload area
   Core-->> Validator: requests for metadata validation
-  TestRunner->> Upload Area: using hca-util cli, syncs test files from hca-util to Upload Service's upload area
+  TestRunner->> Upload Area: using hca-util cli, <br/> syncs test files from hca-util to Upload Service's upload area
   Core-->> Validator: requests for file metadata file validation
   Validator-->>Upload: requests for data file validation
   Upload -->> Upload: does file validation
@@ -41,16 +41,18 @@ sequenceDiagram
   participant Core
   participant Exporter
   participant State as State Tracker
-  participant Upload as Upload Service
+  participant GCPTS as GCP Transfer Service
 
   TestRunner->>TestRunner: generates a VALID submission
   TestRunner->>Core: triggers exporting
   Core->>Exporter: sends messages per assay
-  Exporter->>State: sends messages when a message has been started to process and when it's finished.
+  Exporter->>State: sends messages when a message is being processed <br/> and when it's finished.
   State ->> Core: sets submission state to EXPORTING
   State ->> State: keeps track that all messages are processed
   State ->> Core: sets submission state to EXPORTED
-  Exporter->>Terra: submits metadata and data files to the Terra staging area
+  Exporter->>GCPTS: triggers data file transfer
+  GCPTS->Terra: transfers data files to Terra staging area
+  Exporter->>Terra: creates metadata files to the Terra staging area
   TestRunner ->> Core: polls until submission is EXPORTED, test passes!
 ```
 ### ingest_to_archives
