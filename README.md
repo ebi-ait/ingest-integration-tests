@@ -27,7 +27,6 @@ sequenceDiagram
   TestRunner ->> Core: polls until submission is VALID, test passes!
 ```
 
-
 ## Developer Notes
 
 ### Running Locally
