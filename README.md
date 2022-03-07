@@ -2,7 +2,31 @@
 
 
 # Ingest Integration Tests
-Integration tests for ingest and upload run in non-production environments.
+Integration tests for ingest components.
+```mermaid
+sequenceDiagram
+  participant TestRunner
+  participant Broker
+  participant Core
+  participant Staging Manager
+  participant Validator
+  participant State as State Tracker
+  participant Upload as Upload Service
+
+  TestRunner->>Broker: uploads test spreadsheet
+  Broker-->>Core: creates  metadata entities
+  Core-->> Staging Manager: requests for upload area
+  Staging Manager-->> Core: returns upload area
+  Core-->> Validator: requests for metadata validation
+  TestRunner->> Upload Area: using hca-util cli, syncs test files from hca-util to Upload Service's upload area
+  Core-->> Validator: requests for file metadata file validation
+  Validator-->>Upload: requests for data file validation
+  Upload -->> Upload: does file validation
+  Upload -->> Core: sets file validation job result
+  State -->> Core: sets submission state to VALID
+  TestRunner ->> Core: polls until submission is VALID, test passes!
+```
+
 
 ## Developer Notes
 
@@ -11,25 +35,34 @@ Integration tests for ingest and upload run in non-production environments.
 #### Local Shell Environment
 
 ##### Setting Up the Environment
+1. Go to local directory where repository is cloned.
 
-The tests require a Python 3 environment to run. All the required modules are listed in the `requirements.txt` and can
-be installed through `pip`:
+```
+cd ingest-integration-tests
+```
 
-    pip install -r requirements.txt
+2. The tests require a Python 3 environment to run. Set up a python virtual environment.
+
+3. Install dependencies.
+
+```
+pip install -r requirements.txt
+```
+4. For the tests to be able to successfully authenticate with Ingest Core API, the GCP credentials need to be 
+made locally available.
+
+    * Create `_local` directory. The `_local` directory is being ignored by git for this repo. This is to avoid accidentally committing this secret to GitHub.
+    If you're not downloading to `_local`, make sure you have Git Secrets set up. See the documentation for setting up and configuring Git Secrets.
+    ```
+    mkdir _local
+    ```
+    * The GCP credentials are stored in AWS Secrets Manager; To download GCP credentials and save it into a file, the AWS CLI can be used:
     
-For the tests to be able to successfully communicate with other external services, the GCP credentials need to be 
-made locally available. The GCP credentials are stored in AWS Secrets Manager; one set is store for each development 
-environment. To retrieve GCP credentials, the AWS CLI can be used:
-
-```
- aws secretsmanager get-secret-value \
- --region us-east-1 \
- --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
-```
-
-**IMPORTANT**: Store the credentials file in a secured location. Make sure to not commit it to version control. 
-The `_local` directory given as an example above is a special directory that is configured to be automatically 
-ignored by the version control system.
+    ```
+     aws secretsmanager get-secret-value \
+     --region us-east-1 \
+     --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
+    ```
 
 ##### Running a Single Test
 
