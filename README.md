@@ -1,39 +1,43 @@
 [![pipeline status](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/badges/dev/pipeline.svg)](https://gitlab.ebi.ac.uk/hca/ingest-integration-tests/-/commits/dev)
 
-
 # Ingest Integration Tests
-Integration tests for ingest and upload run in non-production environments.
+Integration tests for ingest components.
+See [sequence diagrams](sequence-diagrams.md)
 
 ## Developer Notes
 
 ### Running Locally
 
-#### Local Shell Environment
+1. Go to local directory where repository is cloned.
 
-##### Setting Up the Environment
+```
+cd ingest-integration-tests
+```
 
-The tests require a Python 3 environment to run. All the required modules are listed in the `requirements.txt` and can
-be installed through `pip`:
+2. The tests require a Python 3 environment to run. Set up a python virtual environment.
 
-    pip install -r requirements.txt
+3. Install dependencies.
+
+```
+pip install -r requirements.txt
+```
+4. For the tests to be able to successfully authenticate with Ingest Core API, the GCP credentials need to be 
+made locally available.
+
+    * Create `_local` directory. The `_local` directory is being ignored by git for this repo. This is to avoid accidentally committing this secret to GitHub.
+    If you're not downloading to `_local`, make sure you have Git Secrets set up. See the documentation for setting up and configuring Git Secrets.
+    ```
+    mkdir _local
+    ```
+    * The GCP credentials are stored in AWS Secrets Manager; To download GCP credentials and save it into a file, the AWS CLI can be used:
     
-For the tests to be able to successfully communicate with other external services, the GCP credentials need to be 
-made locally available. The GCP credentials are stored in AWS Secrets Manager; one set is store for each development 
-environment. To retrieve GCP credentials, the AWS CLI can be used:
+    ```
+     aws secretsmanager get-secret-value \
+     --region us-east-1 \
+     --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
+    ```
 
-```
- aws secretsmanager get-secret-value \
- --region us-east-1 \
- --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
-```
-
-**IMPORTANT**: Store the credentials file in a secured location. Make sure to not commit it to version control. 
-The `_local` directory given as an example above is a special directory that is configured to be automatically 
-ignored by the version control system.
-
-##### Running a Single Test
-
-To run a single test, make sure that all necessary environment variables are provided.
+5. To run a single test, make sure that all necessary environment variables are provided.
 
 ```
 export AWS_PROFILE=embl-ebi; \
@@ -48,7 +52,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
 python3 -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
 ``` 
 
-#### Gitlab Runner
+### Gitlab Runner
 
 The integration tests are primarily designed to run through the Gitlab CI/CD pipeline mechanism. The tests can be run
 through Gitlab locally using `gitlab-runner` that can either be installed or be run as Docker container. Please refer
