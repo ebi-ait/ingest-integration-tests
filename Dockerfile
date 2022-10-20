@@ -9,7 +9,8 @@ RUN apt-get install -y python3-dev python3 python3-pip git jq awscli
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 RUN pip install --upgrade pip
+RUN pip install pip-tools
 ADD ./requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip-sync requirements.txt
 
 ADD ./tests ./tests
