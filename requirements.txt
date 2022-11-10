@@ -38,7 +38,7 @@ exceptiongroup==1.0.0rc9
     # via cattrs
 filetype==1.0.7
     # via hca-util
-hca-ingest==2.4.1
+hca-ingest==2.6.0
     # via -r requirements.in
 hca-util==0.2.12
     # via -r requirements.in

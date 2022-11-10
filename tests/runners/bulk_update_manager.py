@@ -1,5 +1,4 @@
-import requests
-from ingest.api.ingestapi import IngestApi
+from hca_ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
 
 SHEET_CHANGE_VALUE = ' SHEET UPDATE'
@@ -22,7 +21,7 @@ class BulkUpdateManager:
         return entity['_links']['self']['href'].split('/')[-1]
 
     def update_content(self, entity_type, entity_id, original_content):
-        self.ingest_api.patch(self.ingest_url + f'/{entity_type}/' + entity_id, {'content': original_content})
+        self.ingest_api.patch(self.ingest_url + f'/{entity_type}/' + entity_id, json={'content': original_content})
 
     def update_project_title(self, project_sheet):
         project_title_column_index = self.__get_cell_by_header_name(project_sheet, 'project_title')

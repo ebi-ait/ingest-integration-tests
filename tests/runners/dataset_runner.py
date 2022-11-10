@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 
-from ingest.api.ingestapi import IngestApi
+from hca_ingest.api.ingestapi import IngestApi
 
 from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent
 from tests.runners.submission_manager import SubmissionManager
@@ -88,7 +88,7 @@ class DatasetRunner:
             project = projects[0]
             project_url = project.get_url()
             now = datetime.now()
-            r = self.ingest_client_api.patch(project_url, {'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
+            r = self.ingest_client_api.patch(project_url, json={'releaseDate': now.strftime(RELEASE_DATE_FORMAT)})
             r.raise_for_status()
 
     def __create_archive_submission_payload(self, is_direct: bool):
