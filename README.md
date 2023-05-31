@@ -10,7 +10,7 @@ See [sequence diagrams](sequence-diagrams.md)
 
 1. Go to local directory where repository is cloned.
 
-```
+```bash
 cd ingest-integration-tests
 ```
 
@@ -18,7 +18,7 @@ cd ingest-integration-tests
 
 3. Install dependencies.
 
-```
+```bash
 pip install -r requirements.txt
 ```
 4. For the tests to be able to successfully authenticate with Ingest Core API, the GCP credentials need to be 
@@ -31,10 +31,11 @@ made locally available.
     ```
     * The GCP credentials are stored in AWS Secrets Manager; To download GCP credentials and save it into a file, the AWS CLI can be used:
     
-    ```
+    ```bash
      aws secretsmanager get-secret-value \
-     --region us-east-1 \
-     --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
+      --profile embl-ebi \
+      --region us-east-1 \
+      --secret-id ingest/dev/gcp-credentials.json | jq -r .SecretString > _local/gcp-credentials-dev.json
     ```
 
 5. To run a single test, make sure that all necessary environment variables are provided.
@@ -49,11 +50,12 @@ export HCA_UTIL_ADMIN_ACCESS=$(aws secretsmanager get-secret-value --region us-e
 export HCA_UTIL_ADMIN_SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id hca/util/aws-access-keys --query SecretString --output text | jq -jr '.ADMIN_SECRET_ACCESS_KEY'); \
 export HCA_UTIL_ADMIN_PROFILE='test-hca-util-admin'; \
 export GOOGLE_APPLICATION_CREDENTIALS=_local/gcp-credentials-dev.json; \
-python3 -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
+
+nosetests tests.test_ingest:TestRun.test_ingest_to_upload
 ``` 
 
 ### Gitlab Runner
 
 The integration tests are primarily designed to run through the Gitlab CI/CD pipeline mechanism. The tests can be run
 through Gitlab locally using `gitlab-runner` that can either be installed or be run as Docker container. Please refer
-to [the officially documentation](https://docs.gitlab.com/runner/) for more information.
+to [the official documentation](https://docs.gitlab.com/runner/) for more information.
