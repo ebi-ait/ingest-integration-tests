@@ -1,10 +1,10 @@
-FROM ubuntu:latest
+FROM python:3.8
 
 # Stop any questions when installing packages
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
-RUN apt-get install -y python3-dev python3 python3-pip git jq awscli
+RUN apt-get install -y git jq awscli
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
