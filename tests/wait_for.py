@@ -1,3 +1,6 @@
+from functools import partial
+
+import polling
 import time
 
 from . import logger
@@ -17,9 +20,9 @@ class WaitFor:
         self.func_args = args
         self.start_time = None
         self.backoff_seconds = 1.0
-        logger.debug(f"WaitFor {self.func.__name__}")
+        logger.debug(f"WaitFor {func.__name__}")
 
-    def to_return_value(self, value=None, timeout_seconds=None):
+    def to_return_value(self, value=None, fail_if=None, timeout_seconds=None):
         self.start_time = time.time()
         timeout_at = self.start_time + timeout_seconds if timeout_seconds else None
 
@@ -28,6 +31,8 @@ class WaitFor:
             Progress.report(f"  {self.func.__name__} returned {retval}")
             if retval == value:
                 return retval
+            if fail_if and retval == fail_if:
+                raise TimedOut(f"Function {self.func.__name__} returned value {fail_if} ")
             if timeout_at and time.time() > timeout_at:
                 raise TimedOut(f"Function {self.func.__name__} did not return value {value} " +
                                f" within {timeout_seconds} seconds")
