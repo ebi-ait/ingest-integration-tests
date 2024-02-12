@@ -10,17 +10,14 @@ METADATA_COUNT = 1000
 
 
 class BigSubmissionRunner:
-    def __init__(self, deployment, ingest_client_api: IngestApi, token_manager: TokenManager):
+    def __init__(self, deployment, ingest_client_api: IngestApi):
         self.deployment = deployment
         self.ingest_client_api = ingest_client_api
         self.submission_manager = None
         self.submission_envelope = None
         self.ingest_api = IngestApiAgent(deployment=deployment)
-        self.token_manager = token_manager
 
     def run(self, metadata_fixture):
-        token = self.token_manager.get_token()
-        self.ingest_client_api.set_token(f'Bearer {token}')
         submission = self.ingest_client_api.create_submission()
         submission_url = submission["_links"]["self"]["href"]
         self.submission_envelope = self.ingest_api.envelope(envelope_id=None, url=submission_url)

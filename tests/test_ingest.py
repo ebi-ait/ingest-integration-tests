@@ -71,7 +71,7 @@ class TestIngest(unittest.TestCase):
 
     def ingest_big_submission(self):
         metadata_fixture = MetadataFixture()
-        self.runner = BigSubmissionRunner(self.deployment, self.ingest_client_api, self.token_manager)
+        self.runner = BigSubmissionRunner(self.deployment, self.ingest_client_api)
         self.runner.run(metadata_fixture)
         return self.runner
 
