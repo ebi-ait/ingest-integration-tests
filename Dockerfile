@@ -3,7 +3,7 @@ FROM python:3.10
 # Stop any questions when installing packages
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
+RUN apt-get update || true
 RUN apt-get install -y git jq awscli
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
