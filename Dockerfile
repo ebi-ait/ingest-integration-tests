@@ -1,9 +1,9 @@
-FROM python:3.8
+FROM python:3.10
 
 # Stop any questions when installing packages
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update --allow-unauthenticated
+RUN apt-get update
 RUN apt-get install -y git jq awscli
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
