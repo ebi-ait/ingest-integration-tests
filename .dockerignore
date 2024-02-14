@@ -1,0 +1,4 @@
+_local/
+.idea/
+.venv/
+.pytest_cache/
