@@ -63,8 +63,9 @@ set_environment_variable:
 
 test_ingest_to_upload:
   stage: test
-  script:
+  before_script:
     - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
+  script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   needs:
     - job: set_environment_variable
@@ -77,7 +78,6 @@ test_ingest_to_upload:
 test_ingest_to_archives:
   stage: test
   script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
   needs:
     - job: set_environment_variable
@@ -89,7 +89,6 @@ test_ingest_to_archives:
 test_ingest_to_terra:
   stage: test
   script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   needs:
     - job: set_environment_variable
@@ -101,7 +100,6 @@ test_ingest_to_terra:
 test_big_submission:
   stage: test
   script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   needs:
     - job: set_environment_variable
@@ -112,7 +110,6 @@ test_big_submission:
 test_bulk_update:
   stage: test
   script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   needs:
     - job: set_environment_variable
@@ -124,7 +121,6 @@ test_bulk_update:
 test_direct_archiving:
   stage: test
   script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
     - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
   needs:
     - job: set_environment_variable
