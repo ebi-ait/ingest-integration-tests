@@ -6,6 +6,12 @@ stages:
 
 default:
   before_script:
+    - echo "Setting environment-specific variable INGEST_API_JWT_AUDIENCE based on $CI_ENVIRONMENT_NAME"
+    - if [ "$CI_COMMIT_REF_NAME" = "dev" ]; then
+        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
+      else
+        export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
+      fi
     - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
     - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
     - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
@@ -52,23 +58,11 @@ build:
     - docker push $INTEGRATION_TEST_IMAGE_NAME
 
 
-set_environment_variable:
-  script:
-    - echo "Setting environment-specific variable INGEST_API_JWT_AUDIENCE based on $CI_ENVIRONMENT_NAME"
-    - if [ "$CI_ENVIRONMENT_NAME" = "dev" ]; then
-        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
-      else
-        export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
-      fi
 
 test_ingest_to_upload:
   stage: test
-  before_script:
-    - echo "INGEST_API_JWT_AUDIENCE $INGEST_API_JWT_AUDIENCE"
   script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
@@ -79,8 +73,6 @@ test_ingest_to_archives:
   stage: test
   script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
@@ -90,8 +82,6 @@ test_ingest_to_terra:
   stage: test
   script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
@@ -101,8 +91,6 @@ test_big_submission:
   stage: test
   script:
     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
@@ -111,8 +99,6 @@ test_bulk_update:
   stage: test
   script:
     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
@@ -122,8 +108,6 @@ test_direct_archiving:
   stage: test
   script:
     - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
-  needs:
-    - job: set_environment_variable
   only:
     - dev
     - staging
