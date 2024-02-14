@@ -64,7 +64,7 @@ set_environment_variable:
 test_ingest_to_upload:
   stage: test
   before_script:
-    - echo "INGEST_API_JWT_AUDIENCE: $INGEST_API_JWT_AUDIENCE"
+    - echo "INGEST_API_JWT_AUDIENCE $INGEST_API_JWT_AUDIENCE"
   script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   needs:
