@@ -14,8 +14,9 @@ class BulkUpdateManager:
         self.ingest_url = ingest_api.url
 
     def get_entities_by_submission_id_and_type(self, submission_id, entity_type):
-        response = self.ingest_api.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}').json()
-        return response.get('_embedded').get(entity_type)
+        response = self.ingest_api.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}')
+        response.raise_for_status()
+        return response.json().get('_embedded').get(entity_type)
 
     @staticmethod
     def get_id_from_entity(entity):
