@@ -80,7 +80,7 @@ class SubmissionManager:
     def wait_for_envelope_metadata_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")
         WaitFor(self._get_envelope_state) \
-            .to_return_value(value='Metadata valid', fail_if="Metadata invalid")
+            .to_return_value(value='Metadata valid')
         Progress.report(" envelope metadata is valid.\n")
 
     def wait_for_envelope_to_have_valid_graph(self):
