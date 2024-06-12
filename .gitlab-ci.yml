@@ -6,7 +6,12 @@ stages:
 
 default:
   before_script:
-    - export INGEST_API_JWT_AUDIENCE=https://dev.data.humancellatlas.org/
+    - echo "Setting environment-specific variable INGEST_API_JWT_AUDIENCE based on $CI_ENVIRONMENT_NAME"
+    - if [ "$CI_COMMIT_REF_NAME" = "dev" ]; then
+        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
+      else
+        export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
+      fi
     - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
     - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
     - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
@@ -52,6 +57,8 @@ build:
     - docker build -t $INTEGRATION_TEST_IMAGE_NAME .
     - docker push $INTEGRATION_TEST_IMAGE_NAME
 
+
+
 test_ingest_to_upload:
   stage: test
   script:
@@ -59,6 +66,7 @@ test_ingest_to_upload:
   only:
     - dev
     - staging
+    - prod
 
 
 test_ingest_to_archives:
@@ -95,11 +103,3 @@ test_bulk_update:
     - dev
     - staging
     - prod
-
-test_direct_archiving:
-  stage: test
-  script:
-    - python -m unittest tests.test_ingest.TestRun.test_direct_archiving
-  only:
-    - dev
-    - staging

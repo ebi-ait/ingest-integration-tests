@@ -75,6 +75,7 @@ class IngestApiAgent:
     def submissions(self):
         url = self.ingest_api_url + '/submissionEnvelopes?size=1000'
         response = requests.get(url, headers=self.auth_headers)
+        response.raise_for_status()
         return response.json()['_embedded']['submissionEnvelopes']
 
     def envelope(self, envelope_id=None, url=None):
