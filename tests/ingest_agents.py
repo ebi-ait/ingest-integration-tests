@@ -237,7 +237,9 @@ class IngestApiAgent:
             if not self.url:
                 self.url = self.ingest_api_url + f'/submissionEnvelopes/{self.envelope_id}'
 
-            self.data = requests.get(self.url, headers=self.auth_headers).json()
+            r = requests.get(self.url, headers=self.auth_headers)
+            r.raise_for_status()
+            self.data = r.json()
 
 
 class IngestAuthAgent:
