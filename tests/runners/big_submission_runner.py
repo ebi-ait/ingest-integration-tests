@@ -1,7 +1,7 @@
 import copy
 
-from ingest.api.ingestapi import IngestApi
-from ingest.utils.token_manager import TokenManager
+from hca_ingest.api.ingestapi import IngestApi
+from hca_ingest.utils.token_manager import TokenManager
 
 from tests.ingest_agents import IngestApiAgent
 from tests.runners.submission_manager import SubmissionManager
