@@ -7,12 +7,11 @@ stages:
 default:
   before_script:
     - echo "Setting environment-specific variable INGEST_API_JWT_AUDIENCE based on $CI_ENVIRONMENT_NAME"
-#    - if [ "$CI_COMMIT_REF_NAME" = "dev" ]; then
-#        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
-#      else
-#        export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
-#      fi
-    - export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/"
+    - if [ "$CI_COMMIT_REF_NAME" = "prod" ]; then
+        export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
+      else
+        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
+      fi
     - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
     - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
     - export ARCHIVER_API_KEY=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id ingest/${DEPLOYMENT_ENV}/secrets --query SecretString --output text | jq -jr '.archiver_api_key')
