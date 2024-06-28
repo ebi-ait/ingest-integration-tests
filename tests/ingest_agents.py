@@ -343,7 +343,7 @@ class MonitoringAgent:
             "var-submission_id": submission_id
         }
         dashboard_id = os.getenv('MONITORING_DASHBOARD_ID', default='0UyrCGsIk')
-        Progress.report(f"monitoring link is in {self.monitoring_base_url()}/d/{dashboard_id}/{urlencode(monitoring_query_params)}\n")
+        Progress.report(f"monitoring link is in {self.monitoring_base_url()}/d/{dashboard_id}?{urlencode(monitoring_query_params)}\n")
 
     def monitoring_base_url(self):
         URL_TEMPLATE = "https://monitoring.ingest.dev.archive.data.humancellatlas.org"
