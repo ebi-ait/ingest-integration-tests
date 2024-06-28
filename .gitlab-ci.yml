@@ -7,10 +7,10 @@ stages:
 default:
   before_script:
     - echo "Setting environment-specific variable INGEST_API_JWT_AUDIENCE based on $CI_ENVIRONMENT_NAME"
-    - if [ "$CI_COMMIT_REF_NAME" = "dev" ]; then
-        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
-      else
+    - if [ "$CI_COMMIT_REF_NAME" = "prod" ]; then
         export INGEST_API_JWT_AUDIENCE="https://data.humancellatlas.org/";
+      else
+        export INGEST_API_JWT_AUDIENCE="https://dev.data.humancellatlas.org/";
       fi
     - export DEPLOYMENT_ENV=$CI_COMMIT_REF_NAME
     - export DEPLOYMENT_STAGE=${DEPLOYMENT_ENV}
