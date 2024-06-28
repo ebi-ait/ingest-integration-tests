@@ -51,19 +51,24 @@ class TestIngest(unittest.TestCase):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
         self.runner = DatasetRunner(self.ingest_broker,
                                     self.ingest_api,
-                                    monitoring_agent=self.monitoring_base_url)
+                                    monitoring_agent=MonitoringAgent(self.deployment))
         self.runner.complete_run(dataset_fixture)
         return self.runner
 
     def ingest_big_submission(self):
         metadata_fixture = MetadataFixture()
-        self.runner = BigSubmissionRunner(self.deployment, self.ingest_client_api)
+        self.runner = BigSubmissionRunner(self.deployment,
+                                          self.ingest_client_api,
+                                          monitoring_agent=MonitoringAgent(self.deployment))
         self.runner.run(metadata_fixture)
         return self.runner
 
     def bulk_update(self, dataset_name):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
-        self.runner = BulkUpdateRunner(self.ingest_broker, self.ingest_api, self.bulk_update_manager)
+        self.runner = BulkUpdateRunner(self.ingest_broker,
+                                       self.ingest_api,
+                                       self.bulk_update_manager,
+                                       monitoring_agent=MonitoringAgent(self.deployment))
         self.runner.bulk_update_run(dataset_fixture)
 
     def tearDown(self) -> None:
