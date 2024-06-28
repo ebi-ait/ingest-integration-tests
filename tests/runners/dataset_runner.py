@@ -4,7 +4,7 @@ from datetime import datetime
 
 from ingest.api.ingestapi import IngestApi
 
-from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent, MonitoringAgent
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
 from tests.wait_for import WaitFor
@@ -16,12 +16,16 @@ BIOSTUDIES_PREFIX = 'S-BSST'
 
 
 class DatasetRunner:
-    def __init__(self, ingest_broker: IngestBrokerAgent, ingest_api: IngestApiAgent,
-                 ingest_archiver: IngestArchiverAgent = None, ingest_client_api: IngestApi = None):
+    def __init__(self, ingest_broker: IngestBrokerAgent,
+                 ingest_api: IngestApiAgent,
+                 ingest_archiver: IngestArchiverAgent = None,
+                 ingest_client_api: IngestApi = None,
+                 monitoring_agent:MonitoringAgent=None):
         self.ingest_broker = ingest_broker
         self.ingest_api = ingest_api
         self.ingest_archiver = ingest_archiver
         self.ingest_client_api = ingest_client_api
+        self.monitoring_agent = monitoring_agent
         self.submission_id = None
         self.submission_envelope = None
         self.dataset = None
@@ -77,6 +81,9 @@ class DatasetRunner:
                                                        project_uuid=project_uuid)
         Progress.report(f"submission is in {self.ingest_api.ingest_api_url}/submissionEnvelopes/{self.submission_id}\n")
         self.submission_envelope = self.ingest_api.envelope(self.submission_id)
+        self.monitoring_agent.log_monitoring_url(submission_id=self.submission_id,
+                                                 submission_uuid=self.submission_envelope.uuid)
+
 
     def __submit_archive_submission(self, dataset_fixture):
         self.valid_run(dataset_fixture)

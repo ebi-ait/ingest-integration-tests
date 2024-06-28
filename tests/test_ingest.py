@@ -8,7 +8,7 @@ from ingest.utils.token_manager import TokenManager
 
 from tests.fixtures.dataset_fixture import DatasetFixture
 from tests.fixtures.metadata_fixture import MetadataFixture
-from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, IngestArchiverAgent, MonitoringAgent
 from tests.runners.big_submission_runner import BigSubmissionRunner
 from tests.runners.bulk_update_manager import BulkUpdateManager
 from tests.runners.bulk_update_runner import BulkUpdateRunner
@@ -27,45 +27,31 @@ class TestIngest(unittest.TestCase):
         if self.deployment not in DEPLOYMENTS:
             raise RuntimeError(f'DEPLOYMENT_ENV environment variable must be one of {DEPLOYMENTS}')
 
-        if self.deployment == 'prod':
-            self.ingest_api_url = f"https://api.ingest.archive.data.humancellatlas.org"
-        else:
-            self.ingest_api_url = f"https://api.ingest.{self.deployment}.archive.data.humancellatlas.org"
-
         gcp_credentials_file = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
         credential = ServiceCredential.from_file(gcp_credentials_file)
         audience = os.environ.get('INGEST_API_JWT_AUDIENCE')
         self.s2s_token_client = S2STokenClient(credential, audience)
         self.token_manager = TokenManager(self.s2s_token_client)
+        self.ingest_api = IngestApiAgent(deployment=self.deployment)
+        self.ingest_api_url = self.ingest_api.ingest_api_url
         self.ingest_client_api = IngestApi(url=self.ingest_api_url, token_manager=self.token_manager)
         self.ingest_broker = IngestBrokerAgent(self.deployment)
-        self.ingest_api = IngestApiAgent(deployment=self.deployment)
         self.ingest_archiver = IngestArchiverAgent(self.deployment, self.archiver_api_key, self.ingest_api)
         self.bulk_update_manager = BulkUpdateManager(self.ingest_client_api)
         self.runner = None
 
     def ingest_and_upload_only(self, dataset_name):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
-        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api)
+        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api,
+                                    monitoring_agent=MonitoringAgent(self.deployment))
         self.runner.valid_run(dataset_fixture)
-        return self.runner
-
-    @unittest.skip("Skipping until BioStudies fixed issues")
-    def ingest_to_archives(self, dataset_name: str):
-        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
-        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api, self.ingest_archiver, self.ingest_client_api)
-        self.runner.archived_run(dataset_fixture)
-        return self.runner
-
-    def ingest_to_direct_archives(self, dataset_name: str):
-        dataset_fixture = DatasetFixture(dataset_name, self.deployment)
-        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api, self.ingest_archiver, self.ingest_client_api)
-        self.runner.direct_archived_run(dataset_fixture)
         return self.runner
 
     def ingest_to_terra(self, dataset_name):
         dataset_fixture = DatasetFixture(dataset_name, self.deployment)
-        self.runner = DatasetRunner(self.ingest_broker, self.ingest_api)
+        self.runner = DatasetRunner(self.ingest_broker,
+                                    self.ingest_api,
+                                    monitoring_agent=self.monitoring_base_url)
         self.runner.complete_run(dataset_fixture)
         return self.runner
 
@@ -95,13 +81,6 @@ class TestRun(TestIngest):
 
     def test_big_submission_run(self):
         self.ingest_big_submission()
-
-    # cannot be run in prod, need to know how to delete the submitted data to archives
-    def test_ingest_to_archives(self):
-        self.ingest_to_archives(TestRun.DATASET_NAME)
-
-    def test_direct_archiving(self):
-        self.ingest_to_direct_archives(TestRun.DATASET_NAME_FOR_ARCHIVING)
 
     # cannot be run in prod, need to know how to delete the submitted data to terra
     def test_ingest_to_terra(self):

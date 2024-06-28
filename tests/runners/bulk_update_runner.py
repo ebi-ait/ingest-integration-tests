@@ -5,7 +5,7 @@ from copy import deepcopy
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent
+from tests.ingest_agents import IngestBrokerAgent, IngestApiAgent, MonitoringAgent
 from tests.runners.bulk_update_manager import BulkUpdateManager, VALUE_ROW_NUMBER, HEADER_ROW_NUMBER
 from tests.runners.submission_manager import SubmissionManager
 from tests.utils import Progress
@@ -59,10 +59,13 @@ def _get_metadata_info():
 
 
 class BulkUpdateRunner:
-    def __init__(self, ingest_broker: IngestBrokerAgent, ingest_api: IngestApiAgent,
-                 bulk_update_manager: BulkUpdateManager):
+    def __init__(self, ingest_broker: IngestBrokerAgent,
+                 ingest_api: IngestApiAgent,
+                 bulk_update_manager: BulkUpdateManager,
+                 monitoring_agent:MonitoringAgent=None):
         self.ingest_broker = ingest_broker
         self.ingest_api = ingest_api
+        self.monitoring_agent = monitoring_agent
         self.submission_id = None
         self.project_id = None
         self.biomaterial_ids = None
@@ -100,6 +103,8 @@ class BulkUpdateRunner:
                                                        project_uuid=project_uuid)
         Progress.report(f"submission is in {self.ingest_api.ingest_api_url}/submissionEnvelopes/{self.submission_id}\n")
         self.submission_envelope = self.ingest_api.envelope(self.submission_id)
+        self.monitoring_agent.log_monitoring_url(submission_id=self.submission_id,
+                                                 submission_uuid=self.submission_envelope.uuid)
 
     def __upload_modified_spreadsheet(self, path_to_spreadsheet):
         submission_uuid = self.submission_envelope.uuid

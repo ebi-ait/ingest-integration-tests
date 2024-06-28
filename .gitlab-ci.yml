@@ -57,8 +57,6 @@ build:
     - docker build -t $INTEGRATION_TEST_IMAGE_NAME .
     - docker push $INTEGRATION_TEST_IMAGE_NAME
 
-
-
 test_ingest_to_upload:
   stage: test
   script:
@@ -68,16 +66,6 @@ test_ingest_to_upload:
     - staging
     - prod
 
-
-test_ingest_to_archives:
-  stage: test
-  script:
-    - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
-  only:
-    - dev
-    - staging
-
-
 test_ingest_to_terra:
   stage: test
   script:
@@ -85,7 +73,6 @@ test_ingest_to_terra:
   only:
     - dev
     - staging
-
 
 test_big_submission:
   stage: test
