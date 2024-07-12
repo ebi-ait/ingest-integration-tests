@@ -1,4 +1,3 @@
-import jwt
 import requests
 from ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
@@ -32,31 +31,7 @@ class BulkUpdateManager:
 
     def update_content(self, entity_type, entity_id, original_content):
         Progress.report(f'token is: {self.ingest_api.get_headers()}')
-        jwt = self.parse_jwt_token(self.ingest_api.get_headers())
-        Progress.report(f'parsed token is: {jwt}')
-        self.patch_to_provider_api(self.ingest_url + f'/{entity_type}/' + entity_id,
-                                   {'content': original_content}, jwt)
-
-    def parse_jwt_token(self, auth_header):
-        # Extract the JWT token from the Authorization header
-        token = auth_header['Authorization'].split(' ')[1]
-
-        # Decode the token without verifying the signature
-        decoded_token = jwt.decode(token, options={"verify_signature": False})
-
-        return decoded_token
-
-    def patch_to_provider_api(self, entity_patch_url, data, access_token):
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {access_token}'
-        }
-
-        response = requests.patch(entity_patch_url, headers=headers, json=data)
-
-        if response.status_code // 100 == 2:
-            return True
-        return False
+        self.ingest_api.patch(self.ingest_url + f'/{entity_type}/' + entity_id, {'content': original_content})
 
     def update_project_title(self, project_sheet):
         project_title_column_index = self.__get_cell_by_header_name(project_sheet, 'project_title')
