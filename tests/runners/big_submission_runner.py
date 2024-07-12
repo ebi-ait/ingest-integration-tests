@@ -3,16 +3,19 @@ import copy
 from ingest.api.ingestapi import IngestApi
 from ingest.utils.token_manager import TokenManager
 
-from tests.ingest_agents import IngestApiAgent
+from tests.ingest_agents import IngestApiAgent, MonitoringAgent
 from tests.runners.submission_manager import SubmissionManager
 
 METADATA_COUNT = 1000
 
 
 class BigSubmissionRunner:
-    def __init__(self, deployment, ingest_client_api: IngestApi):
+    def __init__(self, deployment,
+                 ingest_client_api: IngestApi,
+                 monitoring_agent:MonitoringAgent=None):
         self.deployment = deployment
         self.ingest_client_api = ingest_client_api
+        self.monitoring_agent = monitoring_agent
         self.submission_manager = None
         self.submission_envelope = None
         self.ingest_api = IngestApiAgent(deployment=deployment)
@@ -20,8 +23,10 @@ class BigSubmissionRunner:
     def run(self, metadata_fixture):
         submission = self.ingest_client_api.create_submission()
         submission_url = submission["_links"]["self"]["href"]
+        submission_id = submission_url.split('/')[-1]
         self.submission_envelope = self.ingest_api.envelope(envelope_id=None, url=submission_url)
-
+        self.monitoring_agent.log_monitoring_url(submission_id=submission_id,
+                                                 submission_uuid=self.submission_envelope.uuid)
         # TODO just use the test spreadsheet here instead of constructing the json
         # the schema version has a risk of being outdated here
         project = metadata_fixture.project

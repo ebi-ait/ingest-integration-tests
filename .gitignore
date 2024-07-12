@@ -112,3 +112,5 @@ _local/
 src/
 
 .DS_Store
+
+http_cache.sqlite

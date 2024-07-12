@@ -1,10 +1,13 @@
 import json
 import os
 from copy import deepcopy
+from urllib.parse import urlencode
 
 import requests
 from ingest.utils.s2s_token_client import S2STokenClient, ServiceCredential
 from ingest.utils.token_manager import TokenManager
+
+from tests.utils import Progress
 
 
 class IngestBrokerAgent:
@@ -75,6 +78,7 @@ class IngestApiAgent:
     def submissions(self):
         url = self.ingest_api_url + '/submissionEnvelopes?size=1000'
         response = requests.get(url, headers=self.auth_headers)
+        response.raise_for_status()
         return response.json()['_embedded']['submissionEnvelopes']
 
     def envelope(self, envelope_id=None, url=None):
@@ -236,7 +240,9 @@ class IngestApiAgent:
             if not self.url:
                 self.url = self.ingest_api_url + f'/submissionEnvelopes/{self.envelope_id}'
 
-            self.data = requests.get(self.url, headers=self.auth_headers).json()
+            r = requests.get(self.url, headers=self.auth_headers)
+            r.raise_for_status()
+            self.data = r.json()
 
 
 class IngestAuthAgent:
@@ -323,3 +329,28 @@ class IngestArchiverAgent:
         complete_url = f'{self.ingest_archiver_url}/archiveSubmissions/{dsp_submission_uuid}/complete'
         r = requests.post(complete_url, headers=self.headers)
         r.raise_for_status()
+
+
+class MonitoringAgent:
+    def __init__(self, deployment: str):
+        self.deployment = deployment
+        self.monitoring_base_url
+
+    def log_monitoring_url(self, submission_id, submission_uuid):
+        monitoring_query_params = {
+            "orgId": os.getenv('MONITORING_ORG_ID', default=1),
+            "var-submission_uuid": submission_uuid,
+            "var-submission_id": submission_id
+        }
+        dashboard_id = os.getenv('MONITORING_DASHBOARD_ID', default='0UyrCGsIk')
+        Progress.report(f"monitoring link is in {self.monitoring_base_url()}/d/{dashboard_id}?{urlencode(monitoring_query_params)}\n")
+
+    def monitoring_base_url(self):
+        URL_TEMPLATE = "https://monitoring.ingest.dev.archive.data.humancellatlas.org"
+        PROD_URL = "https://monitoring.ingest.archive.data.humancellatlas.org"
+
+        if self.deployment == 'prod':
+            return PROD_URL
+        else:
+            return URL_TEMPLATE.format(self.deployment)
+

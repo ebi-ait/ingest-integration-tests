@@ -2,6 +2,8 @@ import requests
 from ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
 
+from tests.utils import Progress
+
 SHEET_CHANGE_VALUE = ' SHEET UPDATE'
 HEADER_ROW_NUMBER = 4
 VALUE_ROW_NUMBER = 6
@@ -14,14 +16,21 @@ class BulkUpdateManager:
         self.ingest_url = ingest_api.url
 
     def get_entities_by_submission_id_and_type(self, submission_id, entity_type):
-        response = self.ingest_api.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}').json()
-        return response.get('_embedded').get(entity_type)
+        kwargs = {
+            'headers': self.ingest_api.get_headers()
+        }
+        kwargs['headers']['Content-type'] = 'application/json'
+        response = self.ingest_api.get(self.ingest_url + f'/submissionEnvelopes/{submission_id}/{entity_type}',
+                                       **kwargs)
+        response.raise_for_status()
+        return response.json().get('_embedded').get(entity_type)
 
     @staticmethod
     def get_id_from_entity(entity):
         return entity['_links']['self']['href'].split('/')[-1]
 
     def update_content(self, entity_type, entity_id, original_content):
+        Progress.report(f'token is: {self.ingest_api.get_headers()}')
         self.ingest_api.patch(self.ingest_url + f'/{entity_type}/' + entity_id, {'content': original_content})
 
     def update_project_title(self, project_sheet):

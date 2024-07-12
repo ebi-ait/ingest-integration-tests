@@ -79,19 +79,20 @@ class SubmissionManager:
 
     def wait_for_envelope_metadata_to_be_validated(self):
         Progress.report("WAIT FOR VALIDATION...")
-        WaitFor(self._envelope_is_in_state, 'Metadata valid').to_return_value(
-            value=True, fail_if="Metadata invalid")
+        WaitFor(self._get_envelope_state) \
+            .to_return_value(value='Metadata valid')
         Progress.report(" envelope metadata is valid.\n")
 
     def wait_for_envelope_to_have_valid_graph(self):
         Progress.report("WAIT FOR GRAPH VALIDATION...")
-        WaitFor(self._envelope_is_in_state, 'Graph valid').to_return_value(value=True, fail_if="Graph invalid")
+        WaitFor(self._get_envelope_state, ) \
+            .to_return_value(value='Graph valid', fail_if="Graph invalid")
         Progress.report(" envelope graph is valid.\n")
 
     def wait_for_envelope_to_be_submitted(self):
         Progress.report("WAIT FOR SUBMITTED...")
-        WaitFor(self._envelope_is_in_state, 'Submitted').to_return_value(
-            value=True)
+        WaitFor(self._envelope_is_in_state, 'Submitted') \
+            .to_return_value(value=True)
         Progress.report(" envelope is submitted.\n")
 
     def wait_for_envelope_to_be_archiving(self):
@@ -102,39 +103,44 @@ class SubmissionManager:
 
     def wait_for_envelope_to_be_archived(self):
         Progress.report("WAIT FOR ARCHIVED...")
-        WaitFor(self._envelope_is_in_state, 'Archived').to_return_value(
-            value=True)
+        WaitFor(self._envelope_is_in_state, 'Archived') \
+            .to_return_value(value=True)
         Progress.report(" envelope is in Archived.\n")
 
     def wait_for_envelope_to_be_exported(self):
         Progress.report("WAIT FOR EXPORTED...")
-        WaitFor(self._envelope_is_in_state, 'Exported').to_return_value(
-            value=True)
+        WaitFor(self._envelope_is_in_state, 'Exported') \
+            .to_return_value(value=True)
         Progress.report(" envelope is in Exported.\n")
 
     def wait_for_envelope_to_be_in_draft(self):
-        Progress.report("WAIT FOR VALIDATION...")
+        Progress.report("WAIT FOR DRAFT...")
         WaitFor(self._envelope_is_in_state, 'Draft').to_return_value(
             value=True)
         Progress.report(" envelope is in Draft.\n")
 
     def wait_for_envelope_metadata_to_be_invalid(self):
-        Progress.report("WAIT FOR VALIDATION...")
-        WaitFor(self._envelope_is_in_state, 'Metadata invalid').to_return_value(
-            value=True)
+        Progress.report("WAIT FOR METADATA INVALID...")
+        (WaitFor(self._envelope_is_in_state, 'Metadata invalid')
+            .to_return_value(value=True))
         Progress.report(" envelope metadata is in Invalid.\n")
 
     def wait_for_envelope_to_complete(self):
         Progress.report("WAIT FOR COMPLETE...")
-        WaitFor(self._envelope_is_in_state, 'Complete').to_return_value(
-            value=True)
+        WaitFor(self._envelope_is_in_state, 'Complete') \
+            .to_return_value(value=True)
         Progress.report(" envelope is in Complete.\n")
 
     def _envelope_is_in_state(self, state):
         envelope_status = self.submission_envelope.reload().status()
         Progress.report(f"envelope status is {envelope_status}")
         return envelope_status in [state]
-        
+
+    def _get_envelope_state(self):
+        envelope_status = self.submission_envelope.reload().status()
+        Progress.report(f"envelope status is {envelope_status}")
+        return envelope_status
+
     def ensure_submitted(self):
         try:
             self.submit_envelope()
