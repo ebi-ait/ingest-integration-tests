@@ -73,6 +73,7 @@ test_ingest_to_terra:
   only:
     - dev
     - staging
+    - prod
 
 test_big_submission:
   stage: test
