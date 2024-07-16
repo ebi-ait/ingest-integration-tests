@@ -1,4 +1,3 @@
-import requests
 from ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
 
