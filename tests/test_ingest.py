@@ -36,7 +36,9 @@ class TestIngest(unittest.TestCase):
         self.ingest_api = IngestApiAgent(deployment=self.deployment)
         self.ingest_api_url = self.ingest_api.ingest_api_url
         self.ingest_client_api = IngestApi(url=self.ingest_api_url, token_manager=self.token_manager)
-        self.ingest_client_api.logger.setLevel(os.environ.get("INGEST_LOG_LEVEL", os.environ.get("INTEGRATION_TESTS_LOG_LEVEL", logging.INFO)))
+        self.ingest_client_api.logger.setLevel(os.environ.get("INGEST_LOG_LEVEL",
+                                                              os.environ.get("INTEGRATION_TESTS_LOG_LEVEL",
+                                                                             logging.INFO)))
         self.ingest_broker = IngestBrokerAgent(self.deployment)
         self.ingest_archiver = IngestArchiverAgent(self.deployment, self.archiver_api_key, self.ingest_api)
         self.bulk_update_manager = BulkUpdateManager(self.ingest_client_api)
