@@ -1,5 +1,11 @@
 variables:
   INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}
+  INGEST_LOG_LEVEL:
+    description: logging level for ingest client logs, default to INTEGRATION_TESTS_LOG_LEVEL
+    value: INFO
+  INTEGRATION_TESTS_LOG_LEVEL:
+    description: logging level for integration tests
+    value: INFO
 stages:
   - build
   - test
