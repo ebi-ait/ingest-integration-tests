@@ -60,6 +60,7 @@ build:
 test_ingest_to_upload:
   stage: test
   script:
+    - sleep $(( RANDOM % 11 + 5 ))
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
@@ -69,6 +70,7 @@ test_ingest_to_upload:
 test_ingest_to_terra:
   stage: test
   script:
+    - sleep $(( RANDOM % 11 + 5 ))
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
     - dev
@@ -78,6 +80,7 @@ test_ingest_to_terra:
 test_big_submission:
   stage: test
   script:
+    - sleep $(( RANDOM % 11 + 5 ))
     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
@@ -86,6 +89,7 @@ test_big_submission:
 test_bulk_update:
   stage: test
   script:
+    - sleep $(( RANDOM % 11 + 5 ))
     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   only:
     - dev
