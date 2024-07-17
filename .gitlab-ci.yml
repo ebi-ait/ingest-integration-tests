@@ -71,10 +71,9 @@ build:
 
 test_ingest_to_upload:
   stage: test
-  before_script:
+  script:
     - echo "sleeping to prevent simultaneous submissions"
     - sleep $(( RANDOM % 21 + 10 ))
-  script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
@@ -83,10 +82,9 @@ test_ingest_to_upload:
 
 test_ingest_to_terra:
   stage: test
-  before_script:
+  script:
     - echo "sleeping to prevent simultaneous submissions"
     - sleep $(( RANDOM % 21 + 10 ))
-  script:
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
     - dev
@@ -95,10 +93,9 @@ test_ingest_to_terra:
 
 test_big_submission:
   stage: test
-  before_script:
+  script:
     - echo "sleeping to prevent simultaneous submissions"
     - sleep $(( RANDOM % 21 + 10 ))
-  script:
     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
@@ -106,10 +103,9 @@ test_big_submission:
 
 test_bulk_update:
   stage: test
-  before_script:
+  script:
     - echo "sleeping to prevent simultaneous submissions"
     - sleep $(( RANDOM % 21 + 10 ))
-  script:
     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   only:
     - dev
