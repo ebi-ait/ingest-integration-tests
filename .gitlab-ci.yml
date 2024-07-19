@@ -1,5 +1,17 @@
 variables:
   INTEGRATION_TEST_IMAGE_NAME: quay.io/ebi-ait/ingest-integration-tests:${CI_COMMIT_REF_NAME}
+  INTEGRATION_TESTS_LOG_LEVEL:
+    description: logging level for integration tests
+    value: INFO
+    options:
+      - INFO
+      - DEBUG
+  INGEST_LOG_LEVEL:
+    description: logging level for ingest client logs
+    value: INFO
+    options:
+      - INFO
+      - DEBUG
 stages:
   - build
   - test
@@ -57,39 +69,33 @@ build:
     - docker build -t $INTEGRATION_TEST_IMAGE_NAME .
     - docker push $INTEGRATION_TEST_IMAGE_NAME
 
-
-
 test_ingest_to_upload:
   stage: test
   script:
+    - echo "sleeping to prevent simultaneous submissions"
+    - sleep $(( RANDOM % 21 + 10 ))
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_upload
   only:
     - dev
     - staging
     - prod
 
-
-test_ingest_to_archives:
-  stage: test
-  script:
-    - python -m unittest tests.test_ingest.TestRun.test_ingest_to_archives
-  only:
-    - dev
-    - staging
-
-
 test_ingest_to_terra:
   stage: test
   script:
+    - echo "sleeping to prevent simultaneous submissions"
+    - sleep $(( RANDOM % 21 + 10 ))
     - python -m unittest tests.test_ingest.TestRun.test_ingest_to_terra
   only:
     - dev
     - staging
-
+    - prod
 
 test_big_submission:
   stage: test
   script:
+    - echo "sleeping to prevent simultaneous submissions"
+    - sleep $(( RANDOM % 21 + 10 ))
     - python -m unittest tests.test_ingest.TestRun.test_big_submission_run
   only:
     - dev
@@ -98,6 +104,8 @@ test_big_submission:
 test_bulk_update:
   stage: test
   script:
+    - echo "sleeping to prevent simultaneous submissions"
+    - sleep $(( RANDOM % 21 + 10 ))
     - python -m unittest tests.test_ingest.TestRun.test_bulk_update
   only:
     - dev

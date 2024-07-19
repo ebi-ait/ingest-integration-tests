@@ -1,6 +1,7 @@
-import requests
 from ingest.api.ingestapi import IngestApi
 from openpyxl.worksheet.worksheet import Worksheet
+
+from tests.utils import Progress
 
 SHEET_CHANGE_VALUE = ' SHEET UPDATE'
 HEADER_ROW_NUMBER = 4
@@ -28,6 +29,7 @@ class BulkUpdateManager:
         return entity['_links']['self']['href'].split('/')[-1]
 
     def update_content(self, entity_type, entity_id, original_content):
+        Progress.report(f'token is: {self.ingest_api.get_headers()}')
         self.ingest_api.patch(self.ingest_url + f'/{entity_type}/' + entity_id, {'content': original_content})
 
     def update_project_title(self, project_sheet):
