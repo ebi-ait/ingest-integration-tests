@@ -81,6 +81,7 @@ class DatasetRunner:
                                                        project_uuid=project_uuid)
         Progress.report(f"submission is in {self.ingest_api.ingest_api_url}/submissionEnvelopes/{self.submission_id}\n")
         self.submission_envelope = self.ingest_api.envelope(self.submission_id)
+        Progress.report(f"submission url in ui: {self.ingest_broker.ingest_broker_url}/submissions/detail?uuid={self.submission_envelope.uuid}\n")
         self.monitoring_agent.log_monitoring_url(submission_id=self.submission_id,
                                                  submission_uuid=self.submission_envelope.uuid)
 

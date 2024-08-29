@@ -81,10 +81,6 @@ class IngestApiAgent:
         response.raise_for_status()
         return response.json()['_embedded']['submissionEnvelopes']
 
-    def envelope(self, envelope_id=None, url=None):
-        return IngestApiAgent.SubmissionEnvelope(envelope_id=envelope_id, ingest_api_url=self.ingest_api_url,
-                                                 auth_headers=self.auth_headers, url=url)
-
     def get_latest_archive_submission(self, ingest_submission_uuid):
         search_url = f'{self.ingest_api_url}/archiveSubmissions/search/findBySubmissionUuid'
         params = {
@@ -98,10 +94,10 @@ class IngestApiAgent:
         latest_archive_submission = archive_submissions[0] if len(archive_submissions) > 0 else None
         return latest_archive_submission
 
+
     class Project:
         def __init__(self, source: dict = {}):
             self._source = deepcopy(source)
-
         def get_uuid(self):
             uuid = self._source.get('uuid')
             return uuid.get('uuid')  # because uuid's are structured as uuid.uuid in the source JSON
@@ -109,7 +105,6 @@ class IngestApiAgent:
         def get_url(self):
             project_url = self._source.get('_links', {}).get('self', {}).get('href', None)
             return project_url
-
     class SubmissionEnvelope:
 
         def __init__(self, envelope_id=None, ingest_api_url=None, auth_headers=None, url=None):
@@ -243,6 +238,10 @@ class IngestApiAgent:
             r = requests.get(self.url, headers=self.auth_headers)
             r.raise_for_status()
             self.data = r.json()
+
+    def envelope(self, envelope_id=None, url=None) -> SubmissionEnvelope:
+        return IngestApiAgent.SubmissionEnvelope(envelope_id=envelope_id, ingest_api_url=self.ingest_api_url,
+                                                 auth_headers=self.auth_headers, url=url)
 
 
 class IngestAuthAgent:
