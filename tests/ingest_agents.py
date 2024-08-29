@@ -48,6 +48,10 @@ class IngestBrokerAgent:
             raise RuntimeError(f"POST {url} response was {response.status_code}: {response.content}")
         return json.loads(response.content)['details']['submission_id']
 
+    def ui_url(self):
+        r = requests.get(self.ingest_broker_url)
+        r.raise_for_status()
+        return r.headers('Location')
     def download_spreadsheet(self, submission_uuid):
         url = self.ingest_broker_url + f'/submissions/{submission_uuid}/spreadsheet'
         response = requests.get(url)
