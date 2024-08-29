@@ -3,6 +3,8 @@ import os
 
 import requests
 
+from tests.utils import Progress
+
 
 class DatasetFixture:
 
@@ -27,7 +29,7 @@ class DatasetFixture:
                          self.name))
         self._spreadsheet = None
         readme_json_path = os.path.join(self.dataset_path, 'README.json')
-
+        Progress.report(f'dataset information path {readme_json_path}\n')
         branch = self.deployment
 
         if self.deployment == 'dev':
@@ -43,6 +45,7 @@ class DatasetFixture:
         self._download_spreadsheet()
 
     def _download_spreadsheet(self):
+        Progress.report(f'downloading spreadsheet from {self.config["spreadsheet_location"]}\n')
         response = requests.get(self.config["spreadsheet_location"])
         with open(self.metadata_spreadsheet_path, 'wb') as f:
             f.write(response.content)
